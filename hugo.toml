@@ -3,11 +3,11 @@ languageCode = "zh-cn"
 title = "我的技术博客"
 enableRobotsTXT = true
 
-[pagination]
-  pagerSize = 10
-
 defaultContentLanguage = "zh"
 hasCJKLanguage = true
+
+[pagination]
+  pagerSize = 10
 
 # ---------------- 模块 ----------------
 [module]
@@ -23,14 +23,7 @@ hasCJKLanguage = true
 
 # ---------------- 输出格式 ----------------
 [outputs]
-  home = ["HTML", "JSON"]
-
-# ---------------- 作者信息 ----------------
-[params.author]
-  name = "kaka"
-  avatar = "/images/avatar.png"
-  intro = "运维 / 云原生 / 架构 / 自动化"
-  description = "记录运维、云原生、网络与系统架构实践"
+  home = ["HTML"]
 
 # ---------------- 站点参数 ----------------
 [params]
@@ -43,6 +36,20 @@ hasCJKLanguage = true
   showReadingTime = true
   showWordCount = true
   showShareButtons = true
+
+# ---------------- 首页 Profile（头像所在） ----------------
+[params.profile]
+  enable = true
+  name = "kaka"
+  subtitle = "运维 / 云原生 / 架构 / 自动化"
+  avatar = "/images/avatar.png"
+
+# ---------------- 作者信息（文章页使用） ----------------
+[params.author]
+  name = "kaka"
+  avatar = "/images/avatar.png"
+  intro = "运维 / 云原生 / 架构 / 自动化"
+  description = "记录运维、云原生、网络与系统架构实践"
 
 # ---------------- 菜单 ----------------
 [[menu.main]]
@@ -80,7 +87,7 @@ hasCJKLanguage = true
 
 [[params.socialIcons]]
   name = "email"
-  url = "mailto:you@example.com"
+  url = "mailto:kakazhang10@gmail.com"
 
 # ---------------- 搜索 ----------------
 [params.search]
@@ -90,5 +97,13 @@ hasCJKLanguage = true
 [params.rss]
   fullContent = true
 
-# ---------------- 多
+# ---------------- 多语言 ----------------
+[languages]
+  [languages.zh]
+    languageName = "中文"
+    weight = 1
+
+  [languages.en]
+    languageName = "English"
+    weight = 2
 

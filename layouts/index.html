@@ -1,0 +1,21 @@
+{{ define "main" }}
+<div class="home-profile" style="text-align:center; padding: 4rem 0;">
+  <img src="{{ .Site.Params.profile.avatar }}" alt="avatar"
+       style="width:120px;height:120px;border-radius:50%;margin-bottom:1rem;">
+  <h1>{{ .Site.Params.profile.name }}</h1>
+  <p style="opacity:0.7;">{{ .Site.Params.profile.subtitle }}</p>
+</div>
+
+<div style="max-width:800px;margin:0 auto;">
+  <h2>最新文章</h2>
+  <ul>
+    {{ range first 5 (where .Site.RegularPages "Section" "posts") }}
+      <li>
+        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        <span style="float:right;opacity:0.6;">{{ .Date.Format "2006-01-02" }}</span>
+      </li>
+    {{ end }}
+  </ul>
+</div>
+{{ end }}
+
