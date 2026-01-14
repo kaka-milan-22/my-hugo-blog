@@ -40,13 +40,13 @@ hasCJKLanguage = true
 # ---------------- 首页 Profile（头像所在） ----------------
 [params.profile]
   enable = true
-  name = "kaka"
+  name = "Kaka"
   subtitle = "运维 / 云原生 / 架构 / 自动化"
   avatar = "/images/avatar.png"
 
 # ---------------- 作者信息（文章页使用） ----------------
 [params.author]
-  name = "kaka"
+  name = "Kaka"
   avatar = "/images/avatar.png"
   intro = "运维 / 云原生 / 架构 / 自动化"
   description = "记录运维、云原生、网络与系统架构实践"
