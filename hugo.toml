@@ -87,7 +87,7 @@ hasCJKLanguage = true
 
 [[params.socialIcons]]
   name = "email"
-  url = "mailto:kakazhang10@gmail.com"
+  url = "mailto:kaka@kakacn.com"
 
 # ---------------- 搜索 ----------------
 [params.search]
