@@ -2,17 +2,40 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on 我的技术博客</title>
-    <link>http://localhost:1313/my-hugo-blog/posts/</link>
+    <link>http://localhost:1314/posts/</link>
     <description>Recent content in Posts on 我的技术博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Sat, 10 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/my-hugo-blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 20 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1314/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>《阿凡达》世界观与核心思想解析：当文明被视为操作系统</title>
+      <link>http://localhost:1314/posts/2026-01-20-avatar-os/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1314/posts/2026-01-20-avatar-os/</guid>
+      
+      <description>《阿凡达》真正讨论的并不是英雄或反派， 而是当两种完全不同的文明架构正面相撞时， 冲突是否还存在“对错”这种简单答案。</description>
+      
+    </item>
+    
+    <item>
+      <title>一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS）</title>
+      <link>http://localhost:1314/posts/2026-01-13-disk-grow/</link>
+      <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1314/posts/2026-01-13-disk-grow/</guid>
+      
+      <description>&lt;h2 id=&#34;前言&#34;&gt;前言&lt;/h2&gt;
+&lt;p&gt;昨天遇到了一个典型的生产环境问题：根盘空间不足。作为一个有多年运维经验的老司机，这种情况见得不少，但每次处理都要格外小心。今天记录一下整个处理过程，希望能给遇到同样问题的朋友们一些参考。&lt;/p&gt;</description>
+      
+    </item>
+    
     <item>
       <title>Hello Hugo</title>
-      <link>http://localhost:1313/my-hugo-blog/posts/hello/</link>
+      <link>http://localhost:1314/posts/hello/</link>
       <pubDate>Sat, 10 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/my-hugo-blog/posts/hello/</guid>
+      <guid>http://localhost:1314/posts/hello/</guid>
       
       <description>&lt;p&gt;这是我的第一篇博客 🎉&lt;/p&gt;</description>
       

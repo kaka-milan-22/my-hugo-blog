@@ -2,9 +2,76 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on 我的技术博客</title>
-    <link>http://localhost:1313/my-hugo-blog/categories/</link>
+    <link>http://localhost:1314/categories/</link>
     <description>Recent content in Categories on 我的技术博客</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>zh</language><atom:link href="http://localhost:1313/my-hugo-blog/categories/index.xml" rel="self" type="application/rss+xml" />
+    <language>zh</language>
+    <lastBuildDate>Tue, 20 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1314/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>电影</title>
+      <link>http://localhost:1314/categories/%E7%94%B5%E5%BD%B1/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1314/categories/%E7%94%B5%E5%BD%B1/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>科幻</title>
+      <link>http://localhost:1314/categories/%E7%A7%91%E5%B9%BB/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1314/categories/%E7%A7%91%E5%B9%BB/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>思想</title>
+      <link>http://localhost:1314/categories/%E6%80%9D%E6%83%B3/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1314/categories/%E6%80%9D%E6%83%B3/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Linux</title>
+      <link>http://localhost:1314/categories/linux/</link>
+      <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1314/categories/linux/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>存储</title>
+      <link>http://localhost:1314/categories/%E5%AD%98%E5%82%A8/</link>
+      <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1314/categories/%E5%AD%98%E5%82%A8/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>运维</title>
+      <link>http://localhost:1314/categories/%E8%BF%90%E7%BB%B4/</link>
+      <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1314/categories/%E8%BF%90%E7%BB%B4/</guid>
+      
+      <description></description>
+      
+    </item>
+    
   </channel>
 </rss>
