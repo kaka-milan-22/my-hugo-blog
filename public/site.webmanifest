@@ -1,7 +1,7 @@
 {
     "name": "我的技术博客",
     "short_name": "我的技术博客",
-    "start_url": "http://localhost:1314/",
+    "start_url": "http://localhost:51273/",
     "theme_color": "#434648",
     "background_color": "#ffffff",
     "display": "standalone",

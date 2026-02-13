@@ -2,17 +2,50 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on 我的技术博客</title>
-    <link>http://localhost:1314/categories/</link>
+    <link>http://localhost:51273/categories/</link>
     <description>Recent content in Categories on 我的技术博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Tue, 20 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1314/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 20 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:51273/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>电影</title>
-      <link>http://localhost:1314/categories/%E7%94%B5%E5%BD%B1/</link>
+      <title>Movies</title>
+      <link>http://localhost:51273/categories/movies/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1314/categories/%E7%94%B5%E5%BD%B1/</guid>
+      <guid>http://localhost:51273/categories/movies/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Philosophy</title>
+      <link>http://localhost:51273/categories/philosophy/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:51273/categories/philosophy/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>Sci-Fi</title>
+      <link>http://localhost:51273/categories/sci-fi/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:51273/categories/sci-fi/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>电影</title>
+      <link>http://localhost:51273/categories/%E7%94%B5%E5%BD%B1/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:51273/categories/%E7%94%B5%E5%BD%B1/</guid>
       
       <description></description>
       
@@ -20,10 +53,10 @@
     
     <item>
       <title>科幻</title>
-      <link>http://localhost:1314/categories/%E7%A7%91%E5%B9%BB/</link>
+      <link>http://localhost:51273/categories/%E7%A7%91%E5%B9%BB/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1314/categories/%E7%A7%91%E5%B9%BB/</guid>
+      <guid>http://localhost:51273/categories/%E7%A7%91%E5%B9%BB/</guid>
       
       <description></description>
       
@@ -31,10 +64,10 @@
     
     <item>
       <title>思想</title>
-      <link>http://localhost:1314/categories/%E6%80%9D%E6%83%B3/</link>
+      <link>http://localhost:51273/categories/%E6%80%9D%E6%83%B3/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1314/categories/%E6%80%9D%E6%83%B3/</guid>
+      <guid>http://localhost:51273/categories/%E6%80%9D%E6%83%B3/</guid>
       
       <description></description>
       
@@ -42,10 +75,10 @@
     
     <item>
       <title>Linux</title>
-      <link>http://localhost:1314/categories/linux/</link>
+      <link>http://localhost:51273/categories/linux/</link>
       <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1314/categories/linux/</guid>
+      <guid>http://localhost:51273/categories/linux/</guid>
       
       <description></description>
       
@@ -53,10 +86,10 @@
     
     <item>
       <title>存储</title>
-      <link>http://localhost:1314/categories/%E5%AD%98%E5%82%A8/</link>
+      <link>http://localhost:51273/categories/%E5%AD%98%E5%82%A8/</link>
       <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1314/categories/%E5%AD%98%E5%82%A8/</guid>
+      <guid>http://localhost:51273/categories/%E5%AD%98%E5%82%A8/</guid>
       
       <description></description>
       
@@ -64,10 +97,21 @@
     
     <item>
       <title>运维</title>
-      <link>http://localhost:1314/categories/%E8%BF%90%E7%BB%B4/</link>
+      <link>http://localhost:51273/categories/%E8%BF%90%E7%BB%B4/</link>
       <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1314/categories/%E8%BF%90%E7%BB%B4/</guid>
+      <guid>http://localhost:51273/categories/%E8%BF%90%E7%BB%B4/</guid>
+      
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>技术深度</title>
+      <link>http://localhost:51273/categories/%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6/</link>
+      <pubDate>Tue, 13 Feb 2024 10:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:51273/categories/%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6/</guid>
       
       <description></description>
       
