@@ -1,1 +1,50 @@
-public/
+############################
+# Hugo build output
+############################
+
+/public/
+/resources/_gen/
+
+############################
+# Hugo temporary files
+############################
+
+.hugo_build.lock
+
+############################
+# OS generated files
+############################
+
+.DS_Store
+Thumbs.db
+
+############################
+# Logs
+############################
+
+*.log
+
+############################
+# Editor / IDE
+############################
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+############################
+# Node (if using theme with npm)
+############################
+
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+############################
+# macOS metadata anywhere
+############################
+
+**/.DS_Store
+
