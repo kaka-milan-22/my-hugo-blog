@@ -1,10 +1,10 @@
 ---
 title: "数据库锁与MVCC：从入门到精通的完整逻辑链"
-date: 2026-02-14T21:30:00+08:00
+date: 2026-02-14T12:30:00+08:00
 draft: false
 tags: ["数据库", "锁", "MVCC", "并发控制", "MySQL"]
 categories: ["数据库技术", "并发编程"]
-author: "Your Name"
+author: "Kaka"
 description: "为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑"
 toc: true
 ---

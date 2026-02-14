@@ -4,7 +4,7 @@ date: 2026-02-14T02:00:00+08:00
 draft: false
 tags: ["数据库", "ACID", "事务", "隔离级别", "MySQL", "PostgreSQL"]
 categories: ["数据库技术", "后端开发"]
-author: "Your Name"
+author: "Kaka"
 description: "深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱"
 toc: true
 ---
