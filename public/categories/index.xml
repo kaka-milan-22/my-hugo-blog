@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on 我的技术博客</title>
-    <link>http://localhost:1313/categories/</link>
+    <link>https://blog.kakacn.com/categories/</link>
     <description>Recent content in Categories on 我的技术博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Sat, 14 Feb 2026 12:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 14 Feb 2026 12:00:00 +0800</lastBuildDate><atom:link href="https://blog.kakacn.com/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>基础架构</title>
-      <link>http://localhost:1313/categories/%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/</link>
+      <link>https://blog.kakacn.com/categories/%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/</link>
       <pubDate>Sat, 14 Feb 2026 12:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1313/categories/%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/</guid>
+      <guid>https://blog.kakacn.com/categories/%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/</guid>
       
       <description></description>
       
@@ -20,10 +20,10 @@
     
     <item>
       <title>网络安全</title>
-      <link>http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/</link>
+      <link>https://blog.kakacn.com/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/</link>
       <pubDate>Sat, 14 Feb 2026 12:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/</guid>
+      <guid>https://blog.kakacn.com/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/</guid>
       
       <description></description>
       
@@ -31,10 +31,10 @@
     
     <item>
       <title>网络技术</title>
-      <link>http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/</link>
+      <link>https://blog.kakacn.com/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/</link>
       <pubDate>Sat, 14 Feb 2026 12:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/</guid>
+      <guid>https://blog.kakacn.com/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/</guid>
       
       <description></description>
       
@@ -42,10 +42,10 @@
     
     <item>
       <title>技术深度</title>
-      <link>http://localhost:1313/categories/%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6/</link>
+      <link>https://blog.kakacn.com/categories/%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6/</link>
       <pubDate>Fri, 13 Feb 2026 10:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1313/categories/%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6/</guid>
+      <guid>https://blog.kakacn.com/categories/%E6%8A%80%E6%9C%AF%E6%B7%B1%E5%BA%A6/</guid>
       
       <description></description>
       
@@ -53,10 +53,10 @@
     
     <item>
       <title>Movies</title>
-      <link>http://localhost:1313/categories/movies/</link>
+      <link>https://blog.kakacn.com/categories/movies/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/categories/movies/</guid>
+      <guid>https://blog.kakacn.com/categories/movies/</guid>
       
       <description></description>
       
@@ -64,10 +64,10 @@
     
     <item>
       <title>Philosophy</title>
-      <link>http://localhost:1313/categories/philosophy/</link>
+      <link>https://blog.kakacn.com/categories/philosophy/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/categories/philosophy/</guid>
+      <guid>https://blog.kakacn.com/categories/philosophy/</guid>
       
       <description></description>
       
@@ -75,10 +75,10 @@
     
     <item>
       <title>Sci-Fi</title>
-      <link>http://localhost:1313/categories/sci-fi/</link>
+      <link>https://blog.kakacn.com/categories/sci-fi/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/categories/sci-fi/</guid>
+      <guid>https://blog.kakacn.com/categories/sci-fi/</guid>
       
       <description></description>
       
@@ -86,10 +86,10 @@
     
     <item>
       <title>电影</title>
-      <link>http://localhost:1313/categories/%E7%94%B5%E5%BD%B1/</link>
+      <link>https://blog.kakacn.com/categories/%E7%94%B5%E5%BD%B1/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/categories/%E7%94%B5%E5%BD%B1/</guid>
+      <guid>https://blog.kakacn.com/categories/%E7%94%B5%E5%BD%B1/</guid>
       
       <description></description>
       
@@ -97,10 +97,10 @@
     
     <item>
       <title>科幻</title>
-      <link>http://localhost:1313/categories/%E7%A7%91%E5%B9%BB/</link>
+      <link>https://blog.kakacn.com/categories/%E7%A7%91%E5%B9%BB/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/categories/%E7%A7%91%E5%B9%BB/</guid>
+      <guid>https://blog.kakacn.com/categories/%E7%A7%91%E5%B9%BB/</guid>
       
       <description></description>
       
@@ -108,10 +108,10 @@
     
     <item>
       <title>思想</title>
-      <link>http://localhost:1313/categories/%E6%80%9D%E6%83%B3/</link>
+      <link>https://blog.kakacn.com/categories/%E6%80%9D%E6%83%B3/</link>
       <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/categories/%E6%80%9D%E6%83%B3/</guid>
+      <guid>https://blog.kakacn.com/categories/%E6%80%9D%E6%83%B3/</guid>
       
       <description></description>
       
@@ -119,10 +119,10 @@
     
     <item>
       <title>Linux</title>
-      <link>http://localhost:1313/categories/linux/</link>
+      <link>https://blog.kakacn.com/categories/linux/</link>
       <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1313/categories/linux/</guid>
+      <guid>https://blog.kakacn.com/categories/linux/</guid>
       
       <description></description>
       
@@ -130,10 +130,10 @@
     
     <item>
       <title>存储</title>
-      <link>http://localhost:1313/categories/%E5%AD%98%E5%82%A8/</link>
+      <link>https://blog.kakacn.com/categories/%E5%AD%98%E5%82%A8/</link>
       <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1313/categories/%E5%AD%98%E5%82%A8/</guid>
+      <guid>https://blog.kakacn.com/categories/%E5%AD%98%E5%82%A8/</guid>
       
       <description></description>
       
@@ -141,10 +141,10 @@
     
     <item>
       <title>运维</title>
-      <link>http://localhost:1313/categories/%E8%BF%90%E7%BB%B4/</link>
+      <link>https://blog.kakacn.com/categories/%E8%BF%90%E7%BB%B4/</link>
       <pubDate>Tue, 13 Jan 2026 15:00:00 +0800</pubDate>
       
-      <guid>http://localhost:1313/categories/%E8%BF%90%E7%BB%B4/</guid>
+      <guid>https://blog.kakacn.com/categories/%E8%BF%90%E7%BB%B4/</guid>
       
       <description></description>
       

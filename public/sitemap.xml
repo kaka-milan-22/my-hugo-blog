@@ -2,14 +2,14 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <sitemap>
-    <loc>http://localhost:1313/zh/sitemap.xml</loc>
+    <loc>https://blog.kakacn.com/zh/sitemap.xml</loc>
     
       <lastmod>2026-02-14T12:00:00+08:00</lastmod>
     
   </sitemap>
   
   <sitemap>
-    <loc>http://localhost:1313/en/sitemap.xml</loc>
+    <loc>https://blog.kakacn.com/en/sitemap.xml</loc>
     
   </sitemap>
   

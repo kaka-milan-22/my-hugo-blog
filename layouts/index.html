@@ -9,13 +9,31 @@
 <div style="max-width:800px;margin:0 auto;">
   <h2>最新文章</h2>
   <ul>
-    {{ range first 5 (where .Site.RegularPages "Section" "posts") }}
+    {{ $paginator := .Paginate (where site.RegularPages "Section" "posts") }}
+    {{ range $paginator.Pages }}
       <li>
         <a href="{{ .RelPermalink }}">{{ .Title }}</a>
         <span style="float:right;opacity:0.6;">{{ .Date.Format "2006-01-02" }}</span>
       </li>
     {{ end }}
   </ul>
+
+  <!-- 分页导航 -->
+  {{ if gt $paginator.TotalPages 1 }}
+  <nav class="pagination" style="text-align:center;margin-top:2rem;">
+    {{ if $paginator.HasPrev }}
+      <a href="{{ $paginator.Prev.URL }}" style="margin-right:1rem;">← 上一页</a>
+    {{ end }}
+    
+    <span style="margin:0 1rem;">
+      第 {{ $paginator.PageNumber }} 页，共 {{ $paginator.TotalPages }} 页
+    </span>
+    
+    {{ if $paginator.HasNext }}
+      <a href="{{ $paginator.Next.URL }}" style="margin-left:1rem;">下一页 →</a>
+    {{ end }}
+  </nav>
+  {{ end }}
 </div>
 {{ end }}
 

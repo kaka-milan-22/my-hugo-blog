@@ -7,7 +7,7 @@ defaultContentLanguage = "zh"
 hasCJKLanguage = true
 
 [pagination]
-  pagerSize = 10
+  pagerSize = 5
 
 # ---------------- 模块 ----------------
 [module]
