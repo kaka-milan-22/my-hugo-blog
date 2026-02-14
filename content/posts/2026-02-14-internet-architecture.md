@@ -15,6 +15,7 @@ author: Kaka
 description: 深入理解互联网的层次结构：从你家的路由器到全球骨干网，数据包究竟是如何穿越这个庞大的网络到达目的地的
 toc: true
 ---
+![internet.png](https://img.kakacn.com/file/1771047011956_internet.png)
 
 ## 前言：那个看不见的世界
 
