@@ -4,7 +4,7 @@ date: 2026-02-15T11:00:00+08:00
 draft: false
 tags: ["kubernetes", "k8s", "container", "orchestration", "devops"]
 categories: ["Container", "Cloud Native", "DevOps"]
-author: "DevOps Team"
+author: "Kaka"
 description: "深入剖析 Kubernetes 的核心架构、组件功能及其成为容器编排标准的原因，帮助运维工程师全面掌握 K8s 技术栈"
 ---
 
