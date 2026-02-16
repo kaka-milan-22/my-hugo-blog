@@ -100,7 +100,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ### 分层结构原理
 
-Docker 镜像采用**分层存储（Layered Storage）**机制，每条 Dockerfile 指令都会创建一个新的只读层。这种设计带来了巨大的优势：
+Docker 镜像采用**分层存储(Layered Storage)**机制，每条 Dockerfile 指令都会创建一个新的只读层。这种设计带来了巨大的优势：
 
 1. **缓存加速**：构建时，未修改的层会被复用
 2. **存储优化**：多个镜像可以共享相同的基础层
