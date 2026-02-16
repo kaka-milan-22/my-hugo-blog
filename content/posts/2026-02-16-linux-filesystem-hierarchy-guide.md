@@ -526,6 +526,75 @@ smartctl -a /dev/sda
 - **硬件看 `/sys`**
 - **命令在 `/bin` 和 `/usr/bin`**
 
+### Linux 文件系统完整树形结构
+
+下面是 Linux 文件系统的完整树形目录结构及各目录用途说明：
+
+```
+/（根目录）
+├── bin/              # 基本用户命令（ls, cp, cat 等）
+├── boot/             # 启动文件（内核、initramfs、GRUB 配置）
+├── dev/              # 设备文件（硬盘、终端、USB 等）
+├── etc/              # 系统配置文件
+│   ├── systemd/      # systemd 服务配置
+│   ├── nginx/        # Nginx 配置
+│   ├── ssh/          # SSH 配置
+│   └── cron.d/       # 定时任务配置
+├── home/             # 普通用户家目录
+│   └── username/     # 用户个人文件和配置
+├── lib/              # 系统共享库文件（32位）
+├── lib64/            # 系统共享库文件（64位）
+├── media/            # 可移动设备挂载点（U盘、光盘）
+├── mnt/              # 临时挂载点（手动挂载）
+├── opt/              # 可选应用程序（第三方软件）
+├── proc/             # 虚拟文件系统（进程和内核信息）
+│   ├── cpuinfo       # CPU 信息
+│   ├── meminfo       # 内存信息
+│   └── [PID]/        # 进程运行时信息
+├── root/             # root 用户家目录
+├── run/              # 运行时数据（PID、socket）
+├── sbin/             # 系统管理命令（仅root使用）
+├── srv/              # 服务数据（Web、FTP 等）
+├── sys/              # 虚拟文件系统（设备和驱动信息）
+│   ├── block/        # 块设备信息
+│   ├── class/        # 设备类别
+│   └── devices/      # 物理设备树
+├── tmp/              # 临时文件（重启清空）
+├── usr/              # 用户程序和数据
+│   ├── bin/          # 用户命令（非基本命令）
+│   ├── sbin/         # 非必需的系统管理命令
+│   ├── lib/          # 应用程序共享库
+│   ├── local/        # 本地安装的软件
+│   ├── share/        # 共享数据（文档、图标）
+│   └── src/          # 源代码
+└── var/              # 可变数据（日志、缓存、数据库）
+    ├── log/          # 日志文件
+    │   ├── syslog    # 系统日志
+    │   ├── auth.log  # 认证日志
+    │   └── nginx/    # Nginx 日志
+    ├── cache/        # 应用程序缓存
+    ├── lib/          # 状态信息（数据库文件）
+    ├── spool/        # 队列数据（邮件、打印任务）
+    ├── tmp/          # 临时文件（重启保留）
+    └── www/          # Web 服务器数据
+```
+
+**目录用途快速对照表：**
+
+| 目录 | 用途 | 典型文件/子目录 |
+|------|------|----------------|
+| `/bin` | 基本命令 | ls, cat, cp, mv, rm |
+| `/boot` | 启动文件 | vmlinuz, initrd.img, grub/ |
+| `/dev` | 设备文件 | sda, tty, null, random |
+| `/etc` | 配置文件 | passwd, hosts, nginx.conf |
+| `/home` | 用户目录 | /home/kaka, /home/admin |
+| `/lib` | 共享库 | libc.so, ld-linux.so |
+| `/proc` | 进程信息 | cpuinfo, meminfo, [PID]/ |
+| `/sys` | 硬件信息 | block/, class/, devices/ |
+| `/tmp` | 临时文件 | session-*, tmp-* |
+| `/usr` | 用户程序 | bin/, lib/, share/, local/ |
+| `/var` | 可变数据 | log/, cache/, lib/, www/ |
+
 掌握这些知识后，你将能够在 Linux 系统中快速定位问题，提升故障排查效率，成为更专业的运维工程师！
 
 ## 参考资料
