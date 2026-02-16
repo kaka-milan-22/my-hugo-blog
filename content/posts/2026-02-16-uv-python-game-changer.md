@@ -8,6 +8,8 @@ author: "Kaka"
 description: "深入了解 uv - Python 生态系统的全新标准工具，一个用 Rust 编写的超快速、统一的项目管理工具"
 ---
 
+![image.png](https://img.kakacn.com/file/1771213060325_image.png)
+
 ## 引言
 
 Python 生态系统迎来了一个新标准，它叫做 **uv**。由 [Ruff](https://github.com/astral-sh/ruff) 的创造者 Astral 团队开发，uv 是一个用 Rust 编写的"Python 版 Cargo"，代表着 Python 工具链的巨大飞跃。
