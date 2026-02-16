@@ -7,7 +7,6 @@ categories: ["云原生", "DevOps"]
 author: "Kaka"
 description: "A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights."
 ---
-![image.png](https://img.kakacn.com/file/1771257558316_image.png)
 
 ## A Visual Journey Through Container Orchestration
 
@@ -19,8 +18,6 @@ This article takes a visual + conceptual approach to explain why Kubernetes exis
 
 ## The Container Revolution: How We Got Here
 
-![image.png](https://img.kakacn.com/file/1771257117195_image.png)
-
 Modern application deployment evolved through clear stages:
 
 **Monolith → Virtual Machines → Containers → Orchestration**
@@ -30,8 +27,6 @@ Each stage solved one major problem but introduced a new one. Containers finally
 **Key insight:** Containers solved packaging. Kubernetes solved operations.
 
 ## Before Containers: Deployment Chaos
-
-![image.png](https://img.kakacn.com/file/1771257148722_image.png)
 
 Running applications directly on servers led to:
 
@@ -46,8 +41,6 @@ Every release felt risky. Stability depended on luck more than design.
 
 ## The Monolith Problem
 
-![image.png](https://img.kakacn.com/file/1771257162994_image.png)
-
 Traditional monolithic applications were:
 
 - Large and tightly coupled
@@ -61,8 +54,6 @@ A single bug could bring the entire system down.
 
 ## Virtual Machines: The First Real Solution
 
-![image.png](https://img.kakacn.com/file/1771257675597_image.png)
-
 Virtual Machines introduced isolation and stability, but at a cost:
 
 - Heavy OS overhead
@@ -74,8 +65,6 @@ They were powerful, but not agile.
 **Lesson:** VMs brought isolation, not velocity.
 
 ## Docker Changed Everything
-
-![image.png](https://img.kakacn.com/file/1771257172373_image.png)
 
 Docker revolutionized application delivery by introducing:
 
@@ -89,8 +78,6 @@ Developers finally achieved true environment consistency.
 
 ## Containers Are Great… Until Scale
 
-![image.png](https://img.kakacn.com/file/1771257197638_image.png)
-
 Containers solved packaging - but at scale, teams asked:
 
 - How do we auto-scale containers?
@@ -103,8 +90,6 @@ This is where Kubernetes enters.
 **Lesson:** Containers need a conductor.
 
 ## Enter Kubernetes: The Captain of Containers
-
-![image.png](https://img.kakacn.com/file/1771257210638_image.png)
 
 Kubernetes is a container orchestration platform that manages:
 
@@ -120,8 +105,6 @@ It doesn't replace Docker - it coordinates containers across infrastructure.
 
 ## What Kubernetes Really Promises
 
-![image.png](https://img.kakacn.com/file/1771257217341_image.png)
-
 Kubernetes delivers on four core promises:
 
 1. **Deploy once, run anywhere**
@@ -135,8 +118,6 @@ You describe the desired state. Kubernetes continuously works to maintain it.
 
 ## Kubernetes Architecture: Master & Worker Nodes
 
-![image.png](https://img.kakacn.com/file/1771257224603_image.png)
-
 At a high level, a Kubernetes cluster is split into two parts:
 
 - **Control Plane** – Makes decisions
@@ -145,8 +126,6 @@ At a high level, a Kubernetes cluster is split into two parts:
 This separation is what enables Kubernetes to scale and self-heal.
 
 ## Inside the Control Plane: How Kubernetes Thinks
-
-![image.png](https://img.kakacn.com/file/1771257229667_image.png)
 
 The Control Plane is responsible for:
 
@@ -159,8 +138,6 @@ It doesn't run containers - it controls everything.
 
 ### API Server: The Front Door
 
-![image.png](https://img.kakacn.com/file/1771257233337_image.png)
-
 The API Server is the only entry point to the cluster.
 
 - All `kubectl` commands go through it
@@ -170,8 +147,6 @@ The API Server is the only entry point to the cluster.
 **Mental model:** No API Server = no Kubernetes.
 
 ### etcd: The Cluster's Brain Memory
-
-![image.png](https://img.kakacn.com/file/1771257244452_image.png)
 
 etcd is a distributed key-value store that holds:
 
@@ -185,8 +160,6 @@ It is the single source of truth for Kubernetes.
 
 ### Scheduler: The Matchmaker
 
-![image.png](https://img.kakacn.com/file/1771257248475_image.png)
-
 The Scheduler decides where Pods should run based on:
 
 - CPU and memory requirements
@@ -199,8 +172,6 @@ It doesn't start containers - it only assigns Pods to Nodes.
 
 ### Controller Manager: The Supervisor
 
-![image.png](https://img.kakacn.com/file/1771257255517_image.png)
-
 Controllers constantly compare:
 
 - **Desired state** (what you want)
@@ -212,15 +183,11 @@ If something drifts, controllers fix it automatically.
 
 ## Worker Nodes: Where Applications Actually Run
 
-![image.png](https://img.kakacn.com/file/1771257259639_image.png)
-
 Once decisions are made, Worker Nodes execute them.
 
 This is where your applications live.
 
 ### Kubelet: The Node Manager
-
-![image.png](https://img.kakacn.com/file/1771257264195_image.png)
 
 Kubelet runs on every worker node and:
 
@@ -232,8 +199,6 @@ Kubelet runs on every worker node and:
 **Mental model:** If a Pod should be running here, kubelet makes sure it is.
 
 ### Container Runtime: The Execution Engine
-
-![image.png](https://img.kakacn.com/file/1771257279146_image.png)
 
 The container runtime:
 
@@ -260,8 +225,6 @@ docker
 
 ### kube-proxy: The Traffic Controller
 
-![image.png](https://img.kakacn.com/file/1771257278575_image.png)
-
 kube-proxy manages network routing inside the cluster:
 
 - Service IPs
@@ -273,8 +236,6 @@ It ensures services remain reachable even when Pods change.
 **Mental model:** Pods are temporary. Services are stable.
 
 ## How Everything Works Together: Simplified Flow
-
-![image.png](https://img.kakacn.com/file/1771257286129_image.png)
 
 Here's what happens when you deploy an application:
 
