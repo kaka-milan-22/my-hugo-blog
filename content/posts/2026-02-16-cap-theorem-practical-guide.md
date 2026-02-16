@@ -20,8 +20,6 @@ description: "从运维视角深入理解 CAP 理论，学会在一致性和可�
 
 本文将从实战角度，帮你彻底理解 CAP 理论，并学会在一致性（Consistency）、可用性（Availability）和分区容错性（Partition Tolerance）之间做出正确的权衡。
 
-![CAP理论三角](https://img.kakacn.com/file/cap-triangle.png)
-
 ## CAP 理论的本质
 
 ### 一句话总结
