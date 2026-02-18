@@ -1,6 +1,6 @@
 ---
 title: "Microservices vs Monolithic Architecture: A Practical Guide for DevOps and Developers"
-date: 2026-02-18T11:15:00+08:00
+date: 2026-02-18T11:10:00+08:00
 draft: false
 tags: ["Microservices", "Monolithic", "Architecture", "DevOps", "System Design", "Cloud Native"]
 categories: ["Architecture", "DevOps", "Cloud Native"]
