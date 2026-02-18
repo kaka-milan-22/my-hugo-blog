@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="zh"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">数据库锁与MVCC：从入门到精通的完整逻辑链 | 我的技术博客</title>
+<meta property="og:title" content="数据库锁与MVCC：从入门到精通的完整逻辑链 | 我的技术博客" />
+<meta name="twitter:title" content="数据库锁与MVCC：从入门到精通的完整逻辑链 | 我的技术博客" />
+<meta itemprop="name" content="数据库锁与MVCC：从入门到精通的完整逻辑链 | 我的技术博客" />
+<meta name="application-name" content="数据库锁与MVCC：从入门到精通的完整逻辑链 | 我的技术博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑">
+<meta itemprop="description" content="为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑" />
+<meta property="og:description" content="为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑" />
+<meta name="twitter:description" content="为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑" />
+
+<meta property="og:locale" content="zh" />
+<meta name="language" content="zh" />
+
+  <link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-01-13-database-locks-mvcc/" title="中文" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-02-14T12:30:00&#43;0800 />
+    <meta property="article:published_time" content=2026-02-14T12:30:00&#43;0800 />
+    <meta property="og:url" content="http://localhost:1313/posts/2026-01-13-database-locks-mvcc/" />
+
+    
+    <meta property="og:article:author" content="Kaka" />
+    <meta property="article:author" content="Kaka" />
+    <meta name="author" content="Kaka" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "数据库锁与MVCC：从入门到精通的完整逻辑链",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-02-14",
+        "description": "为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑",
+        "wordCount":  7213 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-02-14",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "我的技术博客"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.154.3">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/2026-01-13-database-locks-mvcc/">
+  <meta property="og:site_name" content="我的技术博客">
+  <meta property="og:title" content="数据库锁与MVCC：从入门到精通的完整逻辑链">
+  <meta property="og:description" content="为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-14T12:30:00+08:00">
+    <meta property="article:modified_time" content="2026-02-14T12:30:00+08:00">
+    <meta property="article:tag" content="数据库">
+    <meta property="article:tag" content="锁">
+    <meta property="article:tag" content="MVCC">
+    <meta property="article:tag" content="并发控制">
+    <meta property="article:tag" content="MySQL">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="数据库锁与MVCC：从入门到精通的完整逻辑链">
+  <meta name="twitter:description" content="为什么数据库需要锁？表锁、行锁、MVCC到底是什么？一篇文章理清数据库并发控制的完整逻辑">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/2026-01-13-database-locks-mvcc/">
+    <link href="/style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title></title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        首页
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/posts/">
+                        文章
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/tags/">
+                        标签
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">数据库锁与MVCC：从入门到精通的完整逻辑链</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-02-14T12:30:00&#43;08:00" itemprop="datePublished"> 2026年2月14日 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b></b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#开场一个让人抓狂的bug">开场：一个让人抓狂的BUG</a></li>
+    <li><a href="#第一章为什么需要锁问题的起源">第一章：为什么需要锁？——问题的起源</a>
+      <ul>
+        <li><a href="#场景两个人同时改同一条数据">场景：两个人同时改同一条数据</a></li>
+        <li><a href="#核心矛盾性能-vs-正确性">核心矛盾：性能 vs 正确性</a></li>
+      </ul>
+    </li>
+    <li><a href="#第二章表锁最简单粗暴的方案">第二章：表锁——最简单粗暴的方案</a>
+      <ul>
+        <li><a href="#什么是表锁">什么是表锁？</a></li>
+        <li><a href="#表锁的使用">表锁的使用</a></li>
+        <li><a href="#表锁的问题">表锁的问题</a></li>
+        <li><a href="#什么时候用表锁">什么时候用表锁？</a></li>
+      </ul>
+    </li>
+    <li><a href="#第三章行锁精确打击">第三章：行锁——精确打击</a>
+      <ul>
+        <li><a href="#什么是行锁">什么是行锁？</a></li>
+        <li><a href="#行锁的使用">行锁的使用</a></li>
+        <li><a href="#行锁的优势">行锁的优势</a></li>
+        <li><a href="#行锁的类型">行锁的类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#第四章行锁的陷阱锁升级与索引">第四章：行锁的陷阱——锁升级与索引</a>
+      <ul>
+        <li><a href="#陷阱1没有索引--行锁退化成表锁">陷阱1：没有索引 → 行锁退化成表锁</a></li>
+        <li><a href="#陷阱2范围查询锁住了不该锁的行">陷阱2：范围查询锁住了不该锁的行</a></li>
+        <li><a href="#陷阱3死锁">陷阱3：死锁</a></li>
+      </ul>
+    </li>
+    <li><a href="#第五章mvcc不用锁也能并发">第五章：MVCC——不用锁也能并发</a>
+      <ul>
+        <li><a href="#问题读写冲突">问题：读写冲突</a></li>
+        <li><a href="#mvcc是什么">MVCC是什么？</a></li>
+        <li><a href="#mvcc的实现原理">MVCC的实现原理</a></li>
+        <li><a href="#read-view快照">Read View：快照</a></li>
+        <li><a href="#mvcc的实际效果">MVCC的实际效果</a></li>
+      </ul>
+    </li>
+    <li><a href="#第六章快照读-vs-当前读">第六章：快照读 vs 当前读</a>
+      <ul>
+        <li><a href="#快照读snapshot-read">快照读（Snapshot Read）</a></li>
+        <li><a href="#当前读current-read">当前读（Current Read）</a></li>
+        <li><a href="#什么时候用哪个">什么时候用哪个？</a></li>
+      </ul>
+    </li>
+    <li><a href="#第七章完整的逻辑链从问题到方案">第七章：完整的逻辑链——从问题到方案</a>
+      <ul>
+        <li><a href="#第一层为什么需要并发控制">第一层：为什么需要并发控制？</a></li>
+        <li><a href="#第二层为什么需要锁">第二层：为什么需要锁？</a></li>
+        <li><a href="#第三层为什么从表锁到行锁">第三层：为什么从表锁到行锁？</a></li>
+        <li><a href="#第四层为什么需要mvcc">第四层：为什么需要MVCC？</a></li>
+        <li><a href="#第五层完整的并发控制策略">第五层：完整的并发控制策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#第八章实战指南">第八章：实战指南</a>
+      <ul>
+        <li><a href="#1-如何查看锁信息">1. 如何查看锁信息</a></li>
+        <li><a href="#2-如何避免锁等待">2. 如何避免锁等待</a></li>
+        <li><a href="#3-如何监控锁问题">3. 如何监控锁问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#第九章常见问题faq">第九章：常见问题FAQ</a>
+      <ul>
+        <li><a href="#q1-为什么我的update这么慢">Q1: 为什么我的UPDATE这么慢？</a></li>
+        <li><a href="#q2-快照读会读到脏数据吗">Q2: 快照读会读到脏数据吗？</a></li>
+        <li><a href="#q3-repeatable-read能防止幻读吗">Q3: REPEATABLE READ能防止幻读吗？</a></li>
+        <li><a href="#q4-乐观锁-vs-悲观锁选哪个">Q4: 乐观锁 vs 悲观锁，选哪个？</a></li>
+      </ul>
+    </li>
+    <li><a href="#第十章总结完整的知识地图">第十章：总结——完整的知识地图</a>
+      <ul>
+        <li><a href="#核心要点">核心要点</a></li>
+      </ul>
+    </li>
+    <li><a href="#尾声从抓狂到从容">尾声：从抓狂到从容</a></li>
+    <li><a href="#附录快速参考">附录：快速参考</a>
+      <ul>
+        <li><a href="#锁的类型">锁的类型</a></li>
+        <li><a href="#sql速查">SQL速查</a></li>
+        <li><a href="#最佳实践">最佳实践</a></li>
+      </ul>
+    </li>
+    <li><a href="#推荐资源">推荐资源</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="开场一个让人抓狂的bug">开场：一个让人抓狂的BUG</h2>
+<p>2016年，我刚做运维的时候，遇到了一个诡异的问题。</p>
+<p>某个下单接口，压测的时候发现：</p>
+<ul>
+<li>单用户测试：响应时间50ms，一切正常 ✅</li>
+<li>100并发测试：响应时间5000ms，慢了100倍 ❌</li>
+</ul>
+<p>后端开发说：&ldquo;我的代码没问题啊，为什么并发就这么慢？&rdquo;</p>
+<p>我看了看监控，CPU不高，内存不高，磁盘IO也不高。那问题在哪？</p>
+<p>直到我打开MySQL的慢查询日志，看到了一堆<code>Waiting for table lock</code>&hellip;</p>
+<p>原来，100个请求在<strong>排队等锁</strong>。就像100个人在一个单人厕所门口排队，当然慢。</p>
+<p>那天，我第一次意识到：<strong>数据库的锁，是性能杀手，也是数据安全的保护神。</strong></p>
+<p>今天，让我用最简单的逻辑，给你讲清楚数据库的锁和MVCC。</p>
+<hr>
+<h2 id="第一章为什么需要锁问题的起源">第一章：为什么需要锁？——问题的起源</h2>
+<h3 id="场景两个人同时改同一条数据">场景：两个人同时改同一条数据</h3>
+<p>想象一个最简单的场景：</p>
+<pre tabindex="0"><code>初始状态：商品库存 = 10
+
+时间轴：
+10:00:00.000  用户A查询库存：SELECT stock FROM products WHERE id=1
+10:00:00.001  用户B查询库存：SELECT stock FROM products WHERE id=1
+              两人都看到：stock = 10
+
+10:00:00.100  用户A购买1个：UPDATE products SET stock = 9 WHERE id=1
+10:00:00.101  用户B购买1个：UPDATE products SET stock = 9 WHERE id=1
+
+结果：库存变成9（应该是8！）
+</code></pre><p>这就是<strong>并发问题</strong>——多个操作同时进行，导致数据不一致。</p>
+<h3 id="核心矛盾性能-vs-正确性">核心矛盾：性能 vs 正确性</h3>
+<p>数据库面临一个两难选择：</p>
+<pre tabindex="0"><code>方案1：串行执行（一个接一个）
+  ✅ 数据绝对正确
+  ❌ 性能极差（并发能力为1）
+
+方案2：完全并行执行（随便执行）
+  ✅ 性能极好
+  ❌ 数据可能错乱
+
+理想方案：在保证正确性的前提下，尽可能并行
+  → 这就是为什么需要&#34;锁&#34;
+</code></pre><p><strong>锁的本质：控制并发访问，保证数据正确性。</strong></p>
+<hr>
+<h2 id="第二章表锁最简单粗暴的方案">第二章：表锁——最简单粗暴的方案</h2>
+<h3 id="什么是表锁">什么是表锁？</h3>
+<p><strong>表锁：锁住整张表，只允许一个人操作。</strong></p>
+<pre tabindex="0"><code>┌─────────────────────────┐
+│   products 表           │
+│  ┌─────────────────┐    │
+│  │  🔒 表锁        │    │ ← 整张表被锁住
+│  ├─────────────────┤    │
+│  │ id | stock      │    │
+│  │ 1  | 10         │    │
+│  │ 2  | 20         │    │
+│  │ 3  | 30         │    │
+│  └─────────────────┘    │
+└─────────────────────────┘
+
+用户A正在操作 → 用户B等待 → 用户C等待 → ...
+</code></pre><h3 id="表锁的使用">表锁的使用</h3>
+<p><strong>MySQL示例：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 加表锁（读锁）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">LOCK</span> TABLES products <span style="color:#66d9ef">READ</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products;  <span style="color:#75715e">-- 可以读
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 其他会话也可以读，但不能写
+</span></span></span><span style="display:flex;"><span>UNLOCK TABLES;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 加表锁（写锁）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">LOCK</span> TABLES products <span style="color:#66d9ef">WRITE</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 其他会话既不能读也不能写，只能等待
+</span></span></span><span style="display:flex;"><span>UNLOCK TABLES;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="表锁的问题">表锁的问题</h3>
+<p><strong>问题1：并发能力极差</strong></p>
+<pre tabindex="0"><code>100个用户同时访问：
+用户1：占用表锁，操作中...（100ms）
+用户2：等待...
+用户3：等待...
+...
+用户100：等待...
+
+总耗时 = 100个用户 × 100ms = 10000ms = 10秒
+</code></pre><p>即使100个用户操作的是不同的商品，也要排队。这太蠢了。</p>
+<p><strong>问题2：容易死锁</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 会话1
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">LOCK</span> TABLES products <span style="color:#66d9ef">WRITE</span>, orders <span style="color:#66d9ef">WRITE</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 会话2（同时执行）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">LOCK</span> TABLES orders <span style="color:#66d9ef">WRITE</span>, products <span style="color:#66d9ef">WRITE</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 💀 死锁：会话1等orders，会话2等products
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>问题3：锁粒度太大</strong></p>
+<p>100个用户访问100个不同的商品，理论上应该可以并行，但表锁让它们串行了。</p>
+<h3 id="什么时候用表锁">什么时候用表锁？</h3>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li>批量导入/导出数据</li>
+<li>表结构变更（ALTER TABLE）</li>
+<li>全表统计（COUNT、SUM）</li>
+</ul>
+<p><strong>不适用场景：</strong></p>
+<ul>
+<li>高并发的OLTP系统（在线交易处理）</li>
+<li>只操作少数几行的场景</li>
+</ul>
+<p><strong>结论：表锁太粗糙，我们需要更细粒度的锁。</strong></p>
+<hr>
+<h2 id="第三章行锁精确打击">第三章：行锁——精确打击</h2>
+<h3 id="什么是行锁">什么是行锁？</h3>
+<p><strong>行锁：只锁住需要操作的那一行，其他行不受影响。</strong></p>
+<pre tabindex="0"><code>┌─────────────────────────┐
+│   products 表           │
+│  ┌─────────────────┐    │
+│  │ id | stock      │    │
+│  │ 1  | 10   🔒   │    │ ← 只锁这一行
+│  │ 2  | 20         │    │ ← 其他行可以并发访问
+│  │ 3  | 30         │    │
+│  └─────────────────┘    │
+└─────────────────────────┘
+
+用户A操作id=1 → 用户B操作id=2（同时进行，互不影响）
+</code></pre><h3 id="行锁的使用">行锁的使用</h3>
+<p><strong>InnoDB默认使用行锁：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查询并锁行（悲观锁）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 此时，id=1这行被锁住，其他事务无法修改
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 更新
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;  <span style="color:#75715e">-- 释放锁
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="行锁的优势">行锁的优势</h3>
+<p><strong>并发能力大幅提升：</strong></p>
+<pre tabindex="0"><code>场景：100个用户访问100个不同商品
+表锁：串行执行，总耗时 = 100 × 100ms = 10秒
+行锁：并行执行，总耗时 ≈ 100ms
+
+性能提升100倍！
+</code></pre><h3 id="行锁的类型">行锁的类型</h3>
+<p><strong>1. 共享锁（S锁，Shared Lock）</strong></p>
+<p>也叫<strong>读锁</strong>。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">LOCK</span> <span style="color:#66d9ef">IN</span> <span style="color:#66d9ef">SHARE</span> <span style="color:#66d9ef">MODE</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>多个事务可以同时持有S锁（可以同时读）</li>
+<li>持有S锁时，其他事务不能加X锁（不能写）</li>
+</ul>
+<p><strong>2. 排他锁（X锁，Exclusive Lock）</strong></p>
+<p>也叫<strong>写锁</strong>。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 或直接UPDATE/DELETE
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>只有一个事务可以持有X锁</li>
+<li>持有X锁时，其他事务既不能读也不能写</li>
+</ul>
+<p><strong>锁的兼容性：</strong></p>
+<pre tabindex="0"><code>┌──────────┬────────┬────────┐
+│   已持有  │  S锁   │  X锁   │
+├──────────┼────────┼────────┤
+│ 请求S锁  │  ✅    │  ❌    │
+│ 请求X锁  │  ❌    │  ❌    │
+└──────────┴────────┴────────┘
+</code></pre><p>简单记忆：</p>
+<ul>
+<li>读-读可以并行 ✅</li>
+<li>读-写互斥 ❌</li>
+<li>写-写互斥 ❌</li>
+</ul>
+<hr>
+<h2 id="第四章行锁的陷阱锁升级与索引">第四章：行锁的陷阱——锁升级与索引</h2>
+<h3 id="陷阱1没有索引--行锁退化成表锁">陷阱1：没有索引 → 行锁退化成表锁</h3>
+<p>这是最坑的一个陷阱。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 假设stock列没有索引
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> stock <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>你以为：</strong> 只锁stock=10的那几行<br>
+<strong>实际上：</strong> 锁住了整张表！</p>
+<p><strong>原因：</strong></p>
+<ul>
+<li>没有索引，InnoDB无法精确定位行</li>
+<li>只能全表扫描</li>
+<li>为了保证正确性，锁住了扫描过的所有行</li>
+<li>结果就是整张表都被锁了</li>
+</ul>
+<p><strong>解决方案：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 添加索引
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">INDEX</span> idx_stock <span style="color:#66d9ef">ON</span> products(stock);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 现在只会锁stock=10的行
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> stock <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="陷阱2范围查询锁住了不该锁的行">陷阱2：范围查询锁住了不该锁的行</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 假设id是主键（有索引）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">5</span> <span style="color:#66d9ef">AND</span> id <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">10</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>你以为：</strong> 只锁id=6,7,8,9这4行<br>
+<strong>实际上：</strong> 可能锁了id=5到id=10之间的所有行，包括不存在的行</p>
+<p>这就是<strong>间隙锁（Gap Lock）</strong>。</p>
+<p><strong>为什么需要间隙锁？</strong></p>
+<p>防止<strong>幻读</strong>：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 事务1
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">5</span> <span style="color:#66d9ef">AND</span> id <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 结果：3行（id=6,7,8）
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 事务2（同时）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> products (id, stock) <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">100</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 事务1再次查询
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">5</span> <span style="color:#66d9ef">AND</span> id <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 结果：4行（多了一个幽灵行！）
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>间隙锁锁住了(5, 10)这个区间，防止其他事务插入新行。</p>
+<h3 id="陷阱3死锁">陷阱3：死锁</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 事务1
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 等待1秒
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 事务2（同时）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 等待1秒
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 💀 死锁！
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 事务1持有id=1的锁，等待id=2
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 事务2持有id=2的锁，等待id=1
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>MySQL的处理：</strong></p>
+<ul>
+<li>自动检测死锁</li>
+<li>回滚其中一个事务</li>
+<li>返回错误：<code>Deadlock found when trying to get lock</code></li>
+</ul>
+<p><strong>如何避免死锁？</strong></p>
+<ol>
+<li>按相同顺序访问资源</li>
+<li>缩短事务时间</li>
+<li>使用乐观锁代替悲观锁</li>
+</ol>
+<hr>
+<h2 id="第五章mvcc不用锁也能并发">第五章：MVCC——不用锁也能并发</h2>
+<h3 id="问题读写冲突">问题：读写冲突</h3>
+<p>即使有了行锁，还有一个问题：</p>
+<pre tabindex="0"><code>时间线：
+用户A：START TRANSACTION（准备生成报表，需要读很多数据）
+用户A：SELECT * FROM products;  -- 读操作，加S锁
+
+用户B：UPDATE products SET stock = stock - 1 WHERE id = 1;
+       -- 写操作，需要X锁，但被A的S锁阻塞
+       -- 等待...等待...等待...
+
+用户A：（10分钟后）COMMIT;  -- 终于释放S锁
+
+用户B：终于可以写了（等了10分钟）
+</code></pre><p>读操作阻塞了写操作，性能很差。</p>
+<p><strong>理想情况：</strong></p>
+<ul>
+<li>读操作不应该阻塞写操作</li>
+<li>写操作不应该阻塞读操作</li>
+<li>读和写应该可以并行</li>
+</ul>
+<p><strong>这就是MVCC要解决的问题。</strong></p>
+<h3 id="mvcc是什么">MVCC是什么？</h3>
+<p><strong>MVCC（Multi-Version Concurrency Control，多版本并发控制）</strong></p>
+<p>核心思想：<strong>一份数据，保存多个版本。</strong></p>
+<pre tabindex="0"><code>同一行数据的多个版本：
+
+版本1（旧版本）: stock = 10  ← 事务A读这个版本
+版本2（新版本）: stock = 9   ← 事务B写这个版本
+
+读和写互不干扰！
+</code></pre><h3 id="mvcc的实现原理">MVCC的实现原理</h3>
+<p>InnoDB在每行记录后面添加了三个隐藏列：</p>
+<p><strong>1. DB_TRX_ID（6字节）</strong></p>
+<ul>
+<li>最后修改这行的事务ID</li>
+</ul>
+<p><strong>2. DB_ROLL_PTR（7字节）</strong></p>
+<ul>
+<li>指向Undo Log的指针（旧版本的数据）</li>
+</ul>
+<p><strong>3. DB_ROW_ID（6字节）</strong></p>
+<ul>
+<li>行ID（如果表没有主键）</li>
+</ul>
+<p><strong>示例：</strong></p>
+<pre tabindex="0"><code>当前数据：
+┌────┬────────┬───────────┬──────────────┐
+│ id │ stock  │ DB_TRX_ID │ DB_ROLL_PTR  │
+├────┼────────┼───────────┼──────────────┤
+│ 1  │ 8      │ 103       │ → Undo Log   │
+└────┴────────┴───────────┴──────────────┘
+
+Undo Log（旧版本链）：
+版本103: stock = 8  (当前版本)
+         ↓
+版本102: stock = 9  (上一个版本)
+         ↓
+版本101: stock = 10 (更早的版本)
+</code></pre><h3 id="read-view快照">Read View：快照</h3>
+<p>当一个事务开始时，InnoDB会创建一个<strong>Read View（读视图）</strong>，记录：</p>
+<ul>
+<li>当前活跃的事务ID列表</li>
+<li>当前最大的事务ID</li>
+</ul>
+<p><strong>可见性判断：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">is_visible</span>(row_trx_id, read_view):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 1. 如果数据是我自己修改的，可见</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> row_trx_id <span style="color:#f92672">==</span> read_view<span style="color:#f92672">.</span>current_trx_id:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 2. 如果数据在我开始前已提交，可见</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> row_trx_id <span style="color:#f92672">&lt;</span> read_view<span style="color:#f92672">.</span>min_trx_id:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 3. 如果数据是在我开始后才创建的，不可见</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> row_trx_id <span style="color:#f92672">&gt;=</span> read_view<span style="color:#f92672">.</span>max_trx_id:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 4. 如果数据的事务在我开始时还未提交，不可见</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> row_trx_id <span style="color:#f92672">in</span> read_view<span style="color:#f92672">.</span>active_trx_ids:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 5. 其他情况，可见</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>如果当前版本不可见，就沿着Undo Log链往前找，直到找到可见的版本。</strong></p>
+<h3 id="mvcc的实际效果">MVCC的实际效果</h3>
+<p><strong>场景：生成报表 vs 下单</strong></p>
+<pre tabindex="0"><code>时间线：
+
+10:00:00  事务A（TRX_ID=100）开始，生成报表
+          Read View = {min: 100, max: 101, active: [100]}
+          
+10:00:01  事务A：SELECT * FROM products WHERE id = 1;
+          读到：stock = 10（版本99的数据）
+
+10:00:02  事务B（TRX_ID=101）开始，下单
+          UPDATE products SET stock = 9 WHERE id = 1;
+          COMMIT;
+          写入新版本（版本101）
+
+10:00:03  事务A：SELECT * FROM products WHERE id = 1;
+          读到：stock = 10（还是版本99！）
+          因为版本101在事务A的Read View之后，不可见
+
+10:05:00  事务A：COMMIT;
+</code></pre><p><strong>关键点：</strong></p>
+<ul>
+<li>事务A始终读到一致的数据（stock=10）</li>
+<li>事务B的写操作没有被阻塞</li>
+<li><strong>读和写完全并行，互不影响</strong></li>
+</ul>
+<hr>
+<h2 id="第六章快照读-vs-当前读">第六章：快照读 vs 当前读</h2>
+<h3 id="快照读snapshot-read">快照读（Snapshot Read）</h3>
+<p>使用MVCC机制，读历史版本：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 普通的SELECT就是快照读
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>特点：</strong></p>
+<ul>
+<li>不加锁</li>
+<li>读的是快照（历史版本）</li>
+<li>高性能，高并发</li>
+</ul>
+<h3 id="当前读current-read">当前读（Current Read）</h3>
+<p>读最新版本，并加锁：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 以下都是当前读：
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span>;  <span style="color:#75715e">-- 加X锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">LOCK</span> <span style="color:#66d9ef">IN</span> <span style="color:#66d9ef">SHARE</span> <span style="color:#66d9ef">MODE</span>;  <span style="color:#75715e">-- 加S锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;  <span style="color:#75715e">-- 加X锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">DELETE</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;  <span style="color:#75715e">-- 加X锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> products <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">10</span>);  <span style="color:#75715e">-- 加X锁
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>特点：</strong></p>
+<ul>
+<li>加锁</li>
+<li>读的是最新版本</li>
+<li>会阻塞其他写操作</li>
+</ul>
+<h3 id="什么时候用哪个">什么时候用哪个？</h3>
+<p><strong>快照读：</strong></p>
+<ul>
+<li>报表生成</li>
+<li>数据分析</li>
+<li>统计查询</li>
+<li>对实时性要求不高的场景</li>
+</ul>
+<p><strong>当前读：</strong></p>
+<ul>
+<li>库存扣减（必须读最新值）</li>
+<li>余额扣款（必须读最新值）</li>
+<li>任何需要&quot;检查后更新&quot;的场景</li>
+</ul>
+<hr>
+<h2 id="第七章完整的逻辑链从问题到方案">第七章：完整的逻辑链——从问题到方案</h2>
+<p>让我们把整个逻辑链串起来：</p>
+<h3 id="第一层为什么需要并发控制">第一层：为什么需要并发控制？</h3>
+<pre tabindex="0"><code>问题：多个用户同时修改数据 → 数据不一致
+方案：需要某种机制控制并发访问
+</code></pre><h3 id="第二层为什么需要锁">第二层：为什么需要锁？</h3>
+<pre tabindex="0"><code>问题：如何控制并发访问？
+方案1：完全串行 → 性能太差
+方案2：使用&#34;锁&#34;来协调访问
+</code></pre><h3 id="第三层为什么从表锁到行锁">第三层：为什么从表锁到行锁？</h3>
+<pre tabindex="0"><code>问题：表锁并发能力太差
+原因：锁粒度太大，100个用户访问100行，也要排队
+方案：使用行锁，只锁需要的行
+</code></pre><h3 id="第四层为什么需要mvcc">第四层：为什么需要MVCC？</h3>
+<pre tabindex="0"><code>问题：即使有行锁，读写还是互斥的
+场景：生成报表（读）阻塞了下单（写）
+方案：MVCC让读写并行
+原理：保存多个版本，读旧版本，写新版本
+</code></pre><h3 id="第五层完整的并发控制策略">第五层：完整的并发控制策略</h3>
+<pre tabindex="0"><code>┌─────────────────────────────────────────┐
+│          并发控制策略                    │
+├─────────────────────────────────────────┤
+│                                         │
+│  普通查询（SELECT）                      │
+│    → 快照读 (MVCC)                      │
+│    → 不加锁，读历史版本                  │
+│    → 高性能，高并发                      │
+│                                         │
+│  需要最新数据（SELECT FOR UPDATE）       │
+│    → 当前读                              │
+│    → 加行锁（X锁或S锁）                  │
+│    → 读最新版本                          │
+│                                         │
+│  写操作（UPDATE/DELETE/INSERT）          │
+│    → 当前读 + 加X锁                     │
+│    → 阻塞其他写操作                      │
+│                                         │
+└─────────────────────────────────────────┘
+</code></pre><hr>
+<h2 id="第八章实战指南">第八章：实战指南</h2>
+<h3 id="1-如何查看锁信息">1. 如何查看锁信息</h3>
+<p><strong>MySQL 5.7+：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 查看当前锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> performance_schema.data_locks;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看锁等待
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> performance_schema.data_lock_waits;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看事务
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> information_schema.innodb_trx;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>实用查询：找出被阻塞的SQL</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> 
+</span></span><span style="display:flex;"><span>    r.trx_id <span style="color:#66d9ef">AS</span> waiting_trx_id,
+</span></span><span style="display:flex;"><span>    r.trx_mysql_thread_id <span style="color:#66d9ef">AS</span> waiting_thread,
+</span></span><span style="display:flex;"><span>    r.trx_query <span style="color:#66d9ef">AS</span> waiting_query,
+</span></span><span style="display:flex;"><span>    b.trx_id <span style="color:#66d9ef">AS</span> blocking_trx_id,
+</span></span><span style="display:flex;"><span>    b.trx_mysql_thread_id <span style="color:#66d9ef">AS</span> blocking_thread,
+</span></span><span style="display:flex;"><span>    b.trx_query <span style="color:#66d9ef">AS</span> blocking_query
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> information_schema.innodb_lock_waits w
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> information_schema.innodb_trx b <span style="color:#66d9ef">ON</span> b.trx_id <span style="color:#f92672">=</span> w.blocking_trx_id
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> information_schema.innodb_trx r <span style="color:#66d9ef">ON</span> r.trx_id <span style="color:#f92672">=</span> w.requesting_trx_id;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-如何避免锁等待">2. 如何避免锁等待</h3>
+<p><strong>策略1：缩短事务时间</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ❌ 不好：事务太长</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    user <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>query(<span style="color:#e6db74">&#34;SELECT * FROM users WHERE id = ?&#34;</span>, user_id)
+</span></span><span style="display:flex;"><span>    send_email(user<span style="color:#f92672">.</span>email)  <span style="color:#75715e"># 慢！可能需要5秒</span>
+</span></span><span style="display:flex;"><span>    update_logs(user<span style="color:#f92672">.</span>id)    <span style="color:#75715e"># 慢！</span>
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE users SET last_login = NOW() WHERE id = ?&#34;</span>, user_id)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✅ 好：缩短事务</span>
+</span></span><span style="display:flex;"><span>user <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>query(<span style="color:#e6db74">&#34;SELECT * FROM users WHERE id = ?&#34;</span>, user_id)
+</span></span><span style="display:flex;"><span>send_email(user<span style="color:#f92672">.</span>email)  <span style="color:#75715e"># 在事务外</span>
+</span></span><span style="display:flex;"><span>update_logs(user<span style="color:#f92672">.</span>id)    <span style="color:#75715e"># 在事务外</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE users SET last_login = NOW() WHERE id = ?&#34;</span>, user_id)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>策略2：避免在事务中进行用户交互</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ❌ 不好：等待用户输入</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    order <span style="color:#f92672">=</span> create_order(user_id, items)
+</span></span><span style="display:flex;"><span>    payment_url <span style="color:#f92672">=</span> request_payment_url(order)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;请访问：&#34;</span>, payment_url)
+</span></span><span style="display:flex;"><span>    input(<span style="color:#e6db74">&#34;支付完成后按回车...&#34;</span>)  <span style="color:#75715e"># 锁一直持有！</span>
+</span></span><span style="display:flex;"><span>    confirm_order(order)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✅ 好：分成多个事务</span>
+</span></span><span style="display:flex;"><span>order <span style="color:#f92672">=</span> create_order(user_id, items)
+</span></span><span style="display:flex;"><span>payment_url <span style="color:#f92672">=</span> request_payment_url(order)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 用户支付...</span>
+</span></span><span style="display:flex;"><span>confirm_order(order)  <span style="color:#75715e"># 新的事务</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>策略3：使用乐观锁代替悲观锁</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 悲观锁：SELECT FOR UPDATE
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> stock <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span>;  <span style="color:#75715e">-- 立即加锁
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 其他事务必须等待
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 乐观锁：版本号
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 不加锁，在UPDATE时检查版本号
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> products 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>, <span style="color:#66d9ef">version</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">version</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">AND</span> <span style="color:#66d9ef">version</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>;  <span style="color:#75715e">-- 如果version不是5，更新失败
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 如果失败，重试
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-如何监控锁问题">3. 如何监控锁问题</h3>
+<p><strong>关键指标：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 1. 锁等待次数
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> STATUS <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;Innodb_row_lock_waits&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 2. 平均锁等待时间
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> STATUS <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;Innodb_row_lock_time_avg&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 3. 最长锁等待时间
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> STATUS <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;Innodb_row_lock_time_max&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 4. 死锁次数
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> ENGINE INNODB STATUS;  <span style="color:#75715e">-- 查看LATEST DETECTED DEADLOCK部分
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>告警阈值建议：</strong></p>
+<ul>
+<li>锁等待时间 &gt; 1秒 → 警告</li>
+<li>锁等待时间 &gt; 5秒 → 严重</li>
+<li>死锁发生 → 立即通知</li>
+</ul>
+<hr>
+<h2 id="第九章常见问题faq">第九章：常见问题FAQ</h2>
+<h3 id="q1-为什么我的update这么慢">Q1: 为什么我的UPDATE这么慢？</h3>
+<p><strong>可能原因：</strong></p>
+<ol>
+<li>没有索引，行锁退化成表锁</li>
+<li>更新的行太多，锁冲突严重</li>
+<li>长事务持有锁不释放</li>
+<li>死锁导致事务被回滚</li>
+</ol>
+<p><strong>排查步骤：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 1. 查看慢查询
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> PROCESSLIST;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 2. 查看锁等待
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> information_schema.innodb_trx <span style="color:#66d9ef">WHERE</span> trx_state <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;LOCK WAIT&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 3. 查看是否有表锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> <span style="color:#66d9ef">OPEN</span> TABLES <span style="color:#66d9ef">WHERE</span> In_use <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 4. 查看是否有索引
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">EXPLAIN</span> <span style="color:#66d9ef">UPDATE</span> products <span style="color:#66d9ef">SET</span> stock <span style="color:#f92672">=</span> stock <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">WHERE</span> name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;iPhone&#39;</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="q2-快照读会读到脏数据吗">Q2: 快照读会读到脏数据吗？</h3>
+<p><strong>不会。</strong></p>
+<p>快照读读的是<strong>已提交的历史版本</strong>，不会读到未提交的数据（脏读）。</p>
+<p>但是，在同一个事务内，快照读读到的数据可能不是最新的（这是设计如此）。</p>
+<h3 id="q3-repeatable-read能防止幻读吗">Q3: REPEATABLE READ能防止幻读吗？</h3>
+<p><strong>SQL标准：</strong> 不能防止<br>
+<strong>MySQL InnoDB：</strong> 能防止（通过间隙锁）</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- MySQL InnoDB在REPEATABLE READ下
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">5</span> <span style="color:#66d9ef">AND</span> id <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">10</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 加了间隙锁，其他事务无法插入id在(5,10)之间的行
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>但如果是当前读，可能还是会有幻读。</p>
+<h3 id="q4-乐观锁-vs-悲观锁选哪个">Q4: 乐观锁 vs 悲观锁，选哪个？</h3>
+<p><strong>悲观锁（SELECT FOR UPDATE）：</strong></p>
+<ul>
+<li>适合：写多读少、冲突概率高</li>
+<li>优点：不需要重试</li>
+<li>缺点：会阻塞其他事务</li>
+</ul>
+<p><strong>乐观锁（版本号）：</strong></p>
+<ul>
+<li>适合：读多写少、冲突概率低</li>
+<li>优点：不阻塞，性能好</li>
+<li>缺点：需要处理重试逻辑</li>
+</ul>
+<p><strong>经验法则：</strong></p>
+<ul>
+<li>库存扣减（冲突高）→ 悲观锁</li>
+<li>文章编辑（冲突低）→ 乐观锁</li>
+</ul>
+<hr>
+<h2 id="第十章总结完整的知识地图">第十章：总结——完整的知识地图</h2>
+<pre tabindex="0"><code>并发问题的演进：
+
+问题层1：并发修改导致数据不一致
+    ↓
+解决方案1：表锁
+    优点：简单，保证正确性
+    缺点：并发能力差
+    ↓
+问题层2：表锁太粗糙，影响性能
+    ↓
+解决方案2：行锁
+    优点：并发能力大幅提升
+    缺点：读写还是互斥
+    ↓
+问题层3：读操作阻塞写操作
+    ↓
+解决方案3：MVCC
+    优点：读写完全并行
+    原理：多版本，读旧版本
+    ↓
+最终方案：行锁 + MVCC
+    普通SELECT → MVCC（快照读）
+    SELECT FOR UPDATE → 行锁（当前读）
+    UPDATE/DELETE → 行锁（当前读）
+</code></pre><h3 id="核心要点">核心要点</h3>
+<p><strong>1. 锁的本质</strong></p>
+<ul>
+<li>协调并发访问</li>
+<li>在性能和正确性之间权衡</li>
+</ul>
+<p><strong>2. 锁的粒度</strong></p>
+<ul>
+<li>表锁 → 行锁 → 更细粒度</li>
+<li>粒度越细，并发能力越强</li>
+</ul>
+<p><strong>3. MVCC的价值</strong></p>
+<ul>
+<li>让读不阻塞写，写不阻塞读</li>
+<li>代价是需要额外的存储空间（多版本）</li>
+</ul>
+<p><strong>4. 实战建议</strong></p>
+<ul>
+<li>优先使用行锁（确保有索引）</li>
+<li>大部分查询用快照读（不加锁）</li>
+<li>只在必要时用当前读（FOR UPDATE）</li>
+<li>缩短事务时间</li>
+<li>监控锁等待和死锁</li>
+</ul>
+<hr>
+<h2 id="尾声从抓狂到从容">尾声：从抓狂到从容</h2>
+<p>回到开头的故事。那个慢了100倍的接口，最终是怎么解决的？</p>
+<p>我们发现问题出在一个没有索引的WHERE条件，导致行锁退化成了表锁。100个并发请求，变成了100个串行请求。</p>
+<p><strong>解决方案：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 添加索引
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> orders <span style="color:#66d9ef">ADD</span> <span style="color:#66d9ef">INDEX</span> idx_user_status (user_id, status);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 性能从5000ms降到50ms
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 问题解决 ✅
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>从那以后，我学会了：</p>
+<ul>
+<li>锁不是敌人，它是并发控制的工具</li>
+<li>理解锁的原理，才能写出高性能的代码</li>
+<li>监控锁的状态，才能及时发现问题</li>
+</ul>
+<p><strong>数据库的锁和MVCC，看起来复杂，其实就是在解决一个问题：</strong></p>
+<blockquote>
+<p>如何让多个人安全地同时操作同一份数据？</p>
+</blockquote>
+<p>理解了这个逻辑链，一切就都清楚了。</p>
+<hr>
+<h2 id="附录快速参考">附录：快速参考</h2>
+<h3 id="锁的类型">锁的类型</h3>
+<pre tabindex="0"><code>表锁
+  ├─ 读锁（LOCK TABLES ... READ）
+  └─ 写锁（LOCK TABLES ... WRITE）
+
+行锁（InnoDB）
+  ├─ 共享锁/S锁/读锁（LOCK IN SHARE MODE）
+  ├─ 排他锁/X锁/写锁（FOR UPDATE）
+  ├─ 间隙锁（Gap Lock）
+  └─ 临键锁（Next-Key Lock）
+</code></pre><h3 id="sql速查">SQL速查</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 查看锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> performance_schema.data_locks;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看锁等待
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> performance_schema.data_lock_waits;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看事务
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> information_schema.innodb_trx;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看死锁日志
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> ENGINE INNODB STATUS;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 手动加锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">FOR</span> <span style="color:#66d9ef">UPDATE</span>;  <span style="color:#75715e">-- X锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> products <span style="color:#66d9ef">WHERE</span> id <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">LOCK</span> <span style="color:#66d9ef">IN</span> <span style="color:#66d9ef">SHARE</span> <span style="color:#66d9ef">MODE</span>;  <span style="color:#75715e">-- S锁
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 设置锁等待超时
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> innodb_lock_wait_timeout <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>;  <span style="color:#75715e">-- 默认50秒
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="最佳实践">最佳实践</h3>
+<ol>
+<li>✅ 始终在WHERE条件字段上建立索引</li>
+<li>✅ 使用主键或唯一索引访问数据</li>
+<li>✅ 缩短事务时间</li>
+<li>✅ 避免大事务</li>
+<li>✅ 按相同顺序访问资源（避免死锁）</li>
+<li>✅ 大部分SELECT不加锁（使用MVCC）</li>
+<li>❌ 不要在事务中调用外部服务</li>
+<li>❌ 不要在事务中等待用户输入</li>
+<li>❌ 不要在范围查询上使用FOR UPDATE（除非必要）</li>
+</ol>
+<hr>
+<h2 id="推荐资源">推荐资源</h2>
+<p><strong>书籍：</strong></p>
+<ul>
+<li>《高性能MySQL》第三版，第1章和第7章</li>
+<li>《MySQL技术内幕：InnoDB存储引擎》第6章</li>
+</ul>
+<p><strong>文档：</strong></p>
+<ul>
+<li>MySQL官方文档：InnoDB Locking</li>
+<li>MySQL官方文档：InnoDB Multi-Versioning</li>
+</ul>
+<p><strong>工具：</strong></p>
+<ul>
+<li>pt-deadlock-logger：监控死锁</li>
+<li>innotop：实时监控InnoDB</li>
+<li>mysqldumpslow：分析慢查询</li>
+</ul>
+<hr>
+<p><em>下一篇，我们聊聊分布式系统中的锁：Redis分布式锁、ZooKeeper、etcd的实现原理。</em></p>
+<p><em>如果你对某个主题感兴趣（如两阶段锁协议、间隙锁细节、MVCC的Undo Log实现），欢迎留言。</em></p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/kaka-milan-22" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/kaka99859362" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+<a href="mailto:kaka@kakacn.com" target="_blank" rel="noopener noreferrer me"
+    title="Email">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2026 Kaka.
+        
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

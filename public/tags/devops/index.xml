@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Devops on 我的技术博客</title>
+    <link>http://localhost:1313/tags/devops/</link>
+    <description>Recent content in Devops on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Mon, 16 Feb 2026 16:23:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/devops/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Docker 核心组件深度解析：从镜像到编排的完整指南</title>
+      <link>http://localhost:1313/posts/2026-02-16-docker-components-deep-dive/</link>
+      <pubDate>Mon, 16 Feb 2026 16:23:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-docker-components-deep-dive/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Docker 作为容器技术的事实标准，已经成为现代运维工程师必须掌握的核心技能。它通过提供一致的运行环境，彻底解决了&amp;quot;在我的机器上可以运行&amp;quot;的经典问题。本文将深入剖析 Docker 的各个核心组件，从底层原理到实际应用，帮助运维工程师全面理解并高效使用 Docker。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>CAP 理论实战指南：分布式系统的权衡艺术</title>
+      <link>http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/</link>
+      <pubDate>Mon, 16 Feb 2026 15:56:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;如果你是 DevOps 工程师或 SRE，你肯定遇到过这样的场景：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;凌晨 3 点，数据库主从延迟了 5 秒，用户投诉看到了过期数据&lt;/li&gt;
+&lt;li&gt;网络抖动导致集群脑裂，一半节点拒绝写入，另一半正常服务&lt;/li&gt;
+&lt;li&gt;产品经理要求&amp;quot;既要高可用，又要强一致性&amp;quot;，你该如何回应？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这些都是 CAP 理论在真实世界的具体体现。&lt;strong&gt;CAP 不是学术论文里的概念，而是每个运维人员每天都在面对的技术选择。&lt;/strong&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetes Finally Explained - With Diagrams That Actually Make Sense</title>
+      <link>http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/</link>
+      <pubDate>Mon, 16 Feb 2026 14:44:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771257558316_image.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;a-visual-journey-through-container-orchestration&#34;&gt;A Visual Journey Through Container Orchestration&lt;/h2&gt;
+&lt;p&gt;Kubernetes often feels overwhelming at first - not because it&amp;rsquo;s poorly designed, but because most explanations jump straight into YAML and commands.&lt;/p&gt;
+&lt;p&gt;This article takes a visual + conceptual approach to explain why Kubernetes exists, how it works internally, and how all major components fit together.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;If you understand the mental model, Kubernetes becomes logical - even elegant.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;the-container-revolution-how-we-got-here&#34;&gt;The Container Revolution: How We Got Here&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771257117195_image.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>uv: Python 工具链的革命性突破</title>
+      <link>http://localhost:1313/posts/2026-02-16-uv-python-game-changer/</link>
+      <pubDate>Mon, 16 Feb 2026 02:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-uv-python-game-changer/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771213060325_image.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Python 生态系统迎来了一个新标准，它叫做 &lt;strong&gt;uv&lt;/strong&gt;。由 &lt;a href=&#34;https://github.com/astral-sh/ruff&#34;&gt;Ruff&lt;/a&gt; 的创造者 Astral 团队开发，uv 是一个用 Rust 编写的&amp;quot;Python 版 Cargo&amp;quot;，代表着 Python 工具链的巨大飞跃。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetes 深度解析：为什么它成为容器编排的事实标准？</title>
+      <link>http://localhost:1313/posts/2026-02-15-kubernetes-deep-dive/</link>
+      <pubDate>Sun, 15 Feb 2026 11:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-15-kubernetes-deep-dive/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771166552159_k8s_blog_800w.jpg&#34; alt=&#34;k8s_blog_800w.jpg&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在云原生时代，Kubernetes（简称 K8s）已经成为容器编排领域的事实标准。从初创公司到 Google、Netflix 等科技巨头，无数组织都在使用 K8s 管理他们的容器化应用。作为运维工程师，深入理解 K8s 的架构和运作机制，已经成为必备技能。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>2026 年了，直接用 PostgreSQL 吧</title>
+      <link>http://localhost:1313/posts/2026-02-15-postgres-2026/</link>
+      <pubDate>Sun, 15 Feb 2026 10:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-15-postgres-2026/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;想象一下你的数据库就像你的家。你的家有客厅、卧室、浴室、厨房和车库，每个房间都有不同的用途。但它们都在同一个屋檐下，通过走廊和门连接在一起。你不会仅仅因为需要做饭就建一个独立的餐厅大楼，也不会在城市另一端建一个商业车库只为停车。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

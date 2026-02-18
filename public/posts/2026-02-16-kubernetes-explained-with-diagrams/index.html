@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">Kubernetes Finally Explained - With Diagrams That Actually Make Sense | 我的技术博客</title>
+<meta property="og:title" content="Kubernetes Finally Explained - With Diagrams That Actually Make Sense | 我的技术博客" />
+<meta name="twitter:title" content="Kubernetes Finally Explained - With Diagrams That Actually Make Sense | 我的技术博客" />
+<meta itemprop="name" content="Kubernetes Finally Explained - With Diagrams That Actually Make Sense | 我的技术博客" />
+<meta name="application-name" content="Kubernetes Finally Explained - With Diagrams That Actually Make Sense | 我的技术博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights.">
+<meta itemprop="description" content="A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights." />
+<meta property="og:description" content="A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights." />
+<meta name="twitter:description" content="A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights." />
+
+<meta property="og:locale" content="zh" />
+<meta name="language" content="zh" />
+
+  <link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/" title="中文" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-02-16T14:44:00&#43;0800 />
+    <meta property="article:published_time" content=2026-02-16T14:44:00&#43;0800 />
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/" />
+
+    
+    <meta property="og:article:author" content="Kaka" />
+    <meta property="article:author" content="Kaka" />
+    <meta name="author" content="Kaka" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "Kubernetes Finally Explained - With Diagrams That Actually Make Sense",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-02-16",
+        "description": "A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights.",
+        "wordCount":  1284 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-02-16",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "我的技术博客"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.154.3">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/">
+  <meta property="og:site_name" content="我的技术博客">
+  <meta property="og:title" content="Kubernetes Finally Explained - With Diagrams That Actually Make Sense">
+  <meta property="og:description" content="A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights.">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-16T14:44:00+08:00">
+    <meta property="article:modified_time" content="2026-02-16T14:44:00+08:00">
+    <meta property="article:tag" content="Kubernetes">
+    <meta property="article:tag" content="Container">
+    <meta property="article:tag" content="Orchestration">
+    <meta property="article:tag" content="Cloud Native">
+    <meta property="article:tag" content="Devops">
+    <meta property="article:tag" content="Docker">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Kubernetes Finally Explained - With Diagrams That Actually Make Sense">
+  <meta name="twitter:description" content="A visual journey through container orchestration - understand Kubernetes architecture, components, and workflow through clear mental models and practical insights.">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/">
+    <link href="/style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title></title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        首页
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/posts/">
+                        文章
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/tags/">
+                        标签
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">Kubernetes Finally Explained - With Diagrams That Actually Make Sense</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-02-16T14:44:00&#43;08:00" itemprop="datePublished"> 2026年2月16日 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b></b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#a-visual-journey-through-container-orchestration">A Visual Journey Through Container Orchestration</a></li>
+    <li><a href="#the-container-revolution-how-we-got-here">The Container Revolution: How We Got Here</a></li>
+    <li><a href="#before-containers-deployment-chaos">Before Containers: Deployment Chaos</a></li>
+    <li><a href="#the-monolith-problem">The Monolith Problem</a></li>
+    <li><a href="#virtual-machines-the-first-real-solution">Virtual Machines: The First Real Solution</a></li>
+    <li><a href="#docker-changed-everything">Docker Changed Everything</a></li>
+    <li><a href="#containers-are-great-until-scale">Containers Are Great… Until Scale</a></li>
+    <li><a href="#enter-kubernetes-the-captain-of-containers">Enter Kubernetes: The Captain of Containers</a></li>
+    <li><a href="#what-kubernetes-really-promises">What Kubernetes Really Promises</a></li>
+    <li><a href="#kubernetes-architecture-master--worker-nodes">Kubernetes Architecture: Master &amp; Worker Nodes</a></li>
+    <li><a href="#inside-the-control-plane-how-kubernetes-thinks">Inside the Control Plane: How Kubernetes Thinks</a>
+      <ul>
+        <li><a href="#api-server-the-front-door">API Server: The Front Door</a></li>
+        <li><a href="#etcd-the-clusters-brain-memory">etcd: The Cluster&rsquo;s Brain Memory</a></li>
+        <li><a href="#scheduler-the-matchmaker">Scheduler: The Matchmaker</a></li>
+        <li><a href="#controller-manager-the-supervisor">Controller Manager: The Supervisor</a></li>
+      </ul>
+    </li>
+    <li><a href="#worker-nodes-where-applications-actually-run">Worker Nodes: Where Applications Actually Run</a>
+      <ul>
+        <li><a href="#kubelet-the-node-manager">Kubelet: The Node Manager</a></li>
+        <li><a href="#container-runtime-the-execution-engine">Container Runtime: The Execution Engine</a></li>
+        <li><a href="#kube-proxy-the-traffic-controller">kube-proxy: The Traffic Controller</a></li>
+      </ul>
+    </li>
+    <li><a href="#how-everything-works-together-simplified-flow">How Everything Works Together: Simplified Flow</a>
+      <ul>
+        <li><a href="#example-deploying-a-simple-application">Example: Deploying a Simple Application</a></li>
+      </ul>
+    </li>
+    <li><a href="#why-this-understanding-matters">Why This Understanding Matters</a>
+      <ul>
+        <li><a href="#common-debugging-scenarios">Common Debugging Scenarios</a></li>
+      </ul>
+    </li>
+    <li><a href="#key-kubernetes-concepts-explained">Key Kubernetes Concepts Explained</a>
+      <ul>
+        <li><a href="#pods-the-smallest-unit">Pods: The Smallest Unit</a></li>
+        <li><a href="#services-stable-networking">Services: Stable Networking</a></li>
+        <li><a href="#configmaps--secrets-configuration-management">ConfigMaps &amp; Secrets: Configuration Management</a></li>
+      </ul>
+    </li>
+    <li><a href="#best-practices-for-production">Best Practices for Production</a></li>
+    <li><a href="#final-thoughts">Final Thoughts</a></li>
+    <li><a href="#further-reading">Further Reading</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <p><img src="https://img.kakacn.com/file/1771257558316_image.png" alt="image.png"></p>
+<h2 id="a-visual-journey-through-container-orchestration">A Visual Journey Through Container Orchestration</h2>
+<p>Kubernetes often feels overwhelming at first - not because it&rsquo;s poorly designed, but because most explanations jump straight into YAML and commands.</p>
+<p>This article takes a visual + conceptual approach to explain why Kubernetes exists, how it works internally, and how all major components fit together.</p>
+<p><strong>If you understand the mental model, Kubernetes becomes logical - even elegant.</strong></p>
+<h2 id="the-container-revolution-how-we-got-here">The Container Revolution: How We Got Here</h2>
+<p><img src="https://img.kakacn.com/file/1771257117195_image.png" alt="image.png"></p>
+<p>Modern application deployment evolved through clear stages:</p>
+<p><strong>Monolith → Virtual Machines → Containers → Orchestration</strong></p>
+<p>Each stage solved one major problem but introduced a new one. Containers finally gave us speed, portability, and consistency - but managing them at scale created a new challenge.</p>
+<p><strong>Key insight:</strong> Containers solved packaging. Kubernetes solved operations.</p>
+<h2 id="before-containers-deployment-chaos">Before Containers: Deployment Chaos</h2>
+<p><img src="https://img.kakacn.com/file/1771257148722_image.png" alt="image.png"></p>
+<p>Running applications directly on servers led to:</p>
+<ul>
+<li>Resource conflicts</li>
+<li>Environment mismatches</li>
+<li>Deployment failures</li>
+<li>Scaling nightmares</li>
+</ul>
+<p>Every release felt risky. Stability depended on luck more than design.</p>
+<p><strong>Lesson:</strong> Infrastructure without isolation never scales cleanly.</p>
+<h2 id="the-monolith-problem">The Monolith Problem</h2>
+<p><img src="https://img.kakacn.com/file/1771257162994_image.png" alt="image.png"></p>
+<p>Traditional monolithic applications were:</p>
+<ul>
+<li>Large and tightly coupled</li>
+<li>Hard to scale independently</li>
+<li>Risky to update</li>
+<li>Expensive to maintain</li>
+</ul>
+<p>A single bug could bring the entire system down.</p>
+<p><strong>Lesson:</strong> Big codebases don&rsquo;t fail fast - they fail expensively.</p>
+<h2 id="virtual-machines-the-first-real-solution">Virtual Machines: The First Real Solution</h2>
+<p><img src="https://img.kakacn.com/file/1771257675597_image.png" alt="image.png"></p>
+<p>Virtual Machines introduced isolation and stability, but at a cost:</p>
+<ul>
+<li>Heavy OS overhead</li>
+<li>Slow boot times</li>
+<li>Inefficient resource usage</li>
+</ul>
+<p>They were powerful, but not agile.</p>
+<p><strong>Lesson:</strong> VMs brought isolation, not velocity.</p>
+<h2 id="docker-changed-everything">Docker Changed Everything</h2>
+<p><img src="https://img.kakacn.com/file/1771257172373_image.png" alt="image.png"></p>
+<p>Docker revolutionized application delivery by introducing:</p>
+<ul>
+<li>Lightweight containers</li>
+<li>Fast startup times</li>
+<li>Application + dependencies bundled together</li>
+</ul>
+<p>Developers finally achieved true environment consistency.</p>
+<p><strong>Lesson:</strong> &ldquo;It works on my machine&rdquo; stopped being an excuse.</p>
+<h2 id="containers-are-great-until-scale">Containers Are Great… Until Scale</h2>
+<p><img src="https://img.kakacn.com/file/1771257197638_image.png" alt="image.png"></p>
+<p>Containers solved packaging - but at scale, teams asked:</p>
+<ul>
+<li>How do we auto-scale containers?</li>
+<li>What happens when containers crash?</li>
+<li>How do we manage networking?</li>
+<li>How do we deploy with zero downtime?</li>
+</ul>
+<p>This is where Kubernetes enters.</p>
+<p><strong>Lesson:</strong> Containers need a conductor.</p>
+<h2 id="enter-kubernetes-the-captain-of-containers">Enter Kubernetes: The Captain of Containers</h2>
+<p><img src="https://img.kakacn.com/file/1771257210638_image.png" alt="image.png"></p>
+<p>Kubernetes is a container orchestration platform that manages:</p>
+<ul>
+<li>Deployment</li>
+<li>Scaling</li>
+<li>Networking</li>
+<li>Self-healing</li>
+<li>Configuration</li>
+</ul>
+<p>It doesn&rsquo;t replace Docker - it coordinates containers across infrastructure.</p>
+<p><strong>Mental model:</strong> Kubernetes is the operating system for distributed applications.</p>
+<h2 id="what-kubernetes-really-promises">What Kubernetes Really Promises</h2>
+<p><img src="https://img.kakacn.com/file/1771257217341_image.png" alt="image.png"></p>
+<p>Kubernetes delivers on four core promises:</p>
+<ol>
+<li><strong>Deploy once, run anywhere</strong></li>
+<li><strong>Automatic scaling</strong></li>
+<li><strong>Self-healing workloads</strong></li>
+<li><strong>Declarative configuration</strong></li>
+</ol>
+<p>You describe the desired state. Kubernetes continuously works to maintain it.</p>
+<p><strong>Lesson:</strong> You declare intent. Kubernetes enforces reality.</p>
+<h2 id="kubernetes-architecture-master--worker-nodes">Kubernetes Architecture: Master &amp; Worker Nodes</h2>
+<p><img src="https://img.kakacn.com/file/1771257224603_image.png" alt="image.png"></p>
+<p>At a high level, a Kubernetes cluster is split into two parts:</p>
+<ul>
+<li><strong>Control Plane</strong> – Makes decisions</li>
+<li><strong>Worker Nodes</strong> – Run applications</li>
+</ul>
+<p>This separation is what enables Kubernetes to scale and self-heal.</p>
+<h2 id="inside-the-control-plane-how-kubernetes-thinks">Inside the Control Plane: How Kubernetes Thinks</h2>
+<p><img src="https://img.kakacn.com/file/1771257229667_image.png" alt="image.png"></p>
+<p>The Control Plane is responsible for:</p>
+<ul>
+<li>Accepting requests</li>
+<li>Making scheduling decisions</li>
+<li>Tracking cluster state</li>
+<li>Ensuring desired = actual</li>
+</ul>
+<p>It doesn&rsquo;t run containers - it controls everything.</p>
+<h3 id="api-server-the-front-door">API Server: The Front Door</h3>
+<p><img src="https://img.kakacn.com/file/1771257233337_image.png" alt="image.png"></p>
+<p>The API Server is the only entry point to the cluster.</p>
+<ul>
+<li>All <code>kubectl</code> commands go through it</li>
+<li>All components communicate via it</li>
+<li>It validates, authenticates, and authorizes requests</li>
+</ul>
+<p><strong>Mental model:</strong> No API Server = no Kubernetes.</p>
+<h3 id="etcd-the-clusters-brain-memory">etcd: The Cluster&rsquo;s Brain Memory</h3>
+<p><img src="https://img.kakacn.com/file/1771257244452_image.png" alt="image.png"></p>
+<p>etcd is a distributed key-value store that holds:</p>
+<ul>
+<li>Cluster configuration</li>
+<li>Desired state</li>
+<li>Current state</li>
+</ul>
+<p>It is the single source of truth for Kubernetes.</p>
+<p><strong>Mental model:</strong> If it&rsquo;s not in etcd, it doesn&rsquo;t exist.</p>
+<h3 id="scheduler-the-matchmaker">Scheduler: The Matchmaker</h3>
+<p><img src="https://img.kakacn.com/file/1771257248475_image.png" alt="image.png"></p>
+<p>The Scheduler decides where Pods should run based on:</p>
+<ul>
+<li>CPU and memory requirements</li>
+<li>Node availability</li>
+<li>Affinity and constraints</li>
+</ul>
+<p>It doesn&rsquo;t start containers - it only assigns Pods to Nodes.</p>
+<p><strong>Mental model:</strong> Right workload, right node, right time.</p>
+<h3 id="controller-manager-the-supervisor">Controller Manager: The Supervisor</h3>
+<p><img src="https://img.kakacn.com/file/1771257255517_image.png" alt="image.png"></p>
+<p>Controllers constantly compare:</p>
+<ul>
+<li><strong>Desired state</strong> (what you want)</li>
+<li><strong>Actual state</strong> (what exists)</li>
+</ul>
+<p>If something drifts, controllers fix it automatically.</p>
+<p><strong>Mental model:</strong> Kubernetes never stops checking itself.</p>
+<h2 id="worker-nodes-where-applications-actually-run">Worker Nodes: Where Applications Actually Run</h2>
+<p><img src="https://img.kakacn.com/file/1771257259639_image.png" alt="image.png"></p>
+<p>Once decisions are made, Worker Nodes execute them.</p>
+<p>This is where your applications live.</p>
+<h3 id="kubelet-the-node-manager">Kubelet: The Node Manager</h3>
+<p><img src="https://img.kakacn.com/file/1771257264195_image.png" alt="image.png"></p>
+<p>Kubelet runs on every worker node and:</p>
+<ul>
+<li>Registers the node with the cluster</li>
+<li>Watches for Pod assignments</li>
+<li>Ensures containers are running</li>
+<li>Reports health back to the Control Plane</li>
+</ul>
+<p><strong>Mental model:</strong> If a Pod should be running here, kubelet makes sure it is.</p>
+<h3 id="container-runtime-the-execution-engine">Container Runtime: The Execution Engine</h3>
+<p><img src="https://img.kakacn.com/file/1771257279146_image.png" alt="image.png"></p>
+<p>The container runtime:</p>
+<ul>
+<li>Pulls images</li>
+<li>Creates containers</li>
+<li>Starts and stops workloads</li>
+</ul>
+<p>Kubelet communicates with it via the Container Runtime Interface (CRI).</p>
+<p><strong>Key point:</strong> Kubernetes doesn&rsquo;t care which runtime you use - only that it follows CRI.</p>
+<p>Popular runtimes include:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># containerd (most common)</span>
+</span></span><span style="display:flex;"><span>containerd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># CRI-O (OpenShift default)</span>
+</span></span><span style="display:flex;"><span>crio
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Docker Engine (via dockershim, deprecated)</span>
+</span></span><span style="display:flex;"><span>docker
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="kube-proxy-the-traffic-controller">kube-proxy: The Traffic Controller</h3>
+<p><img src="https://img.kakacn.com/file/1771257278575_image.png" alt="image.png"></p>
+<p>kube-proxy manages network routing inside the cluster:</p>
+<ul>
+<li>Service IPs</li>
+<li>Load balancing</li>
+<li>Pod-to-Pod communication</li>
+</ul>
+<p>It ensures services remain reachable even when Pods change.</p>
+<p><strong>Mental model:</strong> Pods are temporary. Services are stable.</p>
+<h2 id="how-everything-works-together-simplified-flow">How Everything Works Together: Simplified Flow</h2>
+<p><img src="https://img.kakacn.com/file/1771257286129_image.png" alt="image.png"></p>
+<p>Here&rsquo;s what happens when you deploy an application:</p>
+<ol>
+<li><strong>User submits a request</strong> via <code>kubectl apply</code></li>
+<li><strong>API Server validates it</strong> and stores in etcd</li>
+<li><strong>Scheduler selects a node</strong> based on resources</li>
+<li><strong>Kubelet runs the Pod</strong> on the assigned node</li>
+<li><strong>Runtime executes containers</strong> inside the Pod</li>
+<li><strong>kube-proxy routes traffic</strong> to the Pod</li>
+<li><strong>Controllers continuously monitor state</strong> and reconcile</li>
+</ol>
+<p>This loop never stops.</p>
+<h3 id="example-deploying-a-simple-application">Example: Deploying a Simple Application</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">matchLabels</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">nginx:1.24</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">containerPort</span>: <span style="color:#ae81ff">80</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>When you apply this:</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kubectl apply -f deployment.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Behind the scenes:</strong></p>
+<ol>
+<li>API Server receives the request</li>
+<li>Deployment Controller creates a ReplicaSet</li>
+<li>ReplicaSet Controller creates 3 Pods</li>
+<li>Scheduler assigns Pods to nodes</li>
+<li>Kubelet pulls nginx image and starts containers</li>
+<li>kube-proxy configures network rules</li>
+</ol>
+<h2 id="why-this-understanding-matters">Why This Understanding Matters</h2>
+<p>Most real-world Kubernetes issues happen because of:</p>
+<ul>
+<li>Poor architectural understanding</li>
+<li>Weak mental models</li>
+<li>Blind YAML usage</li>
+</ul>
+<p>If you understand how Kubernetes thinks, you can:</p>
+<ul>
+<li><strong>Debug faster</strong> - know which component to check</li>
+<li><strong>Design better systems</strong> - understand resource requirements</li>
+<li><strong>Operate confidently in production</strong> - predict behavior</li>
+</ul>
+<h3 id="common-debugging-scenarios">Common Debugging Scenarios</h3>
+<table>
+  <thead>
+      <tr>
+          <th>Issue</th>
+          <th>Component to Check</th>
+          <th>Command</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Pod won&rsquo;t start</td>
+          <td>Kubelet logs</td>
+          <td><code>kubectl describe pod &lt;name&gt;</code></td>
+      </tr>
+      <tr>
+          <td>Service unreachable</td>
+          <td>kube-proxy</td>
+          <td><code>kubectl get endpoints</code></td>
+      </tr>
+      <tr>
+          <td>Scheduling fails</td>
+          <td>Scheduler</td>
+          <td><code>kubectl get events</code></td>
+      </tr>
+      <tr>
+          <td>State inconsistency</td>
+          <td>etcd</td>
+          <td><code>kubectl get all --all-namespaces</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="key-kubernetes-concepts-explained">Key Kubernetes Concepts Explained</h2>
+<h3 id="pods-the-smallest-unit">Pods: The Smallest Unit</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Get all pods</span>
+</span></span><span style="display:flex;"><span>kubectl get pods
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Describe a pod</span>
+</span></span><span style="display:flex;"><span>kubectl describe pod nginx-pod
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get pod logs</span>
+</span></span><span style="display:flex;"><span>kubectl logs nginx-pod
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Execute command in pod</span>
+</span></span><span style="display:flex;"><span>kubectl exec -it nginx-pod -- /bin/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="services-stable-networking">Services: Stable Networking</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-service</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">port</span>: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="configmaps--secrets-configuration-management">ConfigMaps &amp; Secrets: Configuration Management</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Create ConfigMap</span>
+</span></span><span style="display:flex;"><span>kubectl create configmap app-config --from-literal<span style="color:#f92672">=</span>APP_ENV<span style="color:#f92672">=</span>production
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create Secret</span>
+</span></span><span style="display:flex;"><span>kubectl create secret generic db-password --from-literal<span style="color:#f92672">=</span>password<span style="color:#f92672">=</span>mysecret
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Use in Pod</span>
+</span></span><span style="display:flex;"><span>kubectl set env deployment/nginx --from<span style="color:#f92672">=</span>configmap/app-config
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="best-practices-for-production">Best Practices for Production</h2>
+<ol>
+<li><strong>Use namespaces</strong> for isolation</li>
+<li><strong>Set resource requests and limits</strong></li>
+<li><strong>Implement health checks</strong> (liveness, readiness)</li>
+<li><strong>Use declarative configuration</strong> (YAML in Git)</li>
+<li><strong>Enable RBAC</strong> for security</li>
+<li><strong>Monitor everything</strong> (Prometheus, Grafana)</li>
+<li><strong>Plan for disaster recovery</strong> (backup etcd)</li>
+</ol>
+<h2 id="final-thoughts">Final Thoughts</h2>
+<p>Kubernetes isn&rsquo;t complicated - it&rsquo;s distributed.</p>
+<p>Once you understand:</p>
+<ul>
+<li>Why containers exist</li>
+<li>Why orchestration is required</li>
+<li>How control plane and nodes interact</li>
+</ul>
+<p>Kubernetes stops being scary and starts being powerful.</p>
+<p><strong>The key takeaway:</strong> Kubernetes is a declarative system that continuously reconciles desired state with actual state. Every component plays a specific role in this reconciliation loop.</p>
+<p>Start simple, understand the fundamentals, and gradually add complexity as needed.</p>
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://kubernetes.io/docs/">Official Kubernetes Documentation</a></li>
+<li><a href="https://github.com/kelseyhightower/kubernetes-the-hard-way">Kubernetes The Hard Way</a></li>
+<li><a href="https://www.cncf.io/certification/cka/">CNCF Kubernetes Certification</a></li>
+</ul>
+<hr>
+<p><em>Happy orchestrating! 🚀</em></p>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/kaka-milan-22" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/kaka99859362" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+<a href="mailto:kaka@kakacn.com" target="_blank" rel="noopener noreferrer me"
+    title="Email">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2026 Kaka.
+        
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

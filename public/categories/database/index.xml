@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Database on 我的技术博客</title>
+    <link>http://localhost:1313/categories/database/</link>
+    <description>Recent content in Database on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sun, 15 Feb 2026 10:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/categories/database/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2026 年了，直接用 PostgreSQL 吧</title>
+      <link>http://localhost:1313/posts/2026-02-15-postgres-2026/</link>
+      <pubDate>Sun, 15 Feb 2026 10:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-15-postgres-2026/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;想象一下你的数据库就像你的家。你的家有客厅、卧室、浴室、厨房和车库，每个房间都有不同的用途。但它们都在同一个屋檐下，通过走廊和门连接在一起。你不会仅仅因为需要做饭就建一个独立的餐厅大楼，也不会在城市另一端建一个商业车库只为停车。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

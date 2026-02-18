@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>DevOps on 我的技术博客</title>
+    <link>http://localhost:1313/categories/devops/</link>
+    <description>Recent content in DevOps on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Mon, 16 Feb 2026 16:23:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/categories/devops/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Docker 核心组件深度解析：从镜像到编排的完整指南</title>
+      <link>http://localhost:1313/posts/2026-02-16-docker-components-deep-dive/</link>
+      <pubDate>Mon, 16 Feb 2026 16:23:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-docker-components-deep-dive/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Docker 作为容器技术的事实标准，已经成为现代运维工程师必须掌握的核心技能。它通过提供一致的运行环境，彻底解决了&amp;quot;在我的机器上可以运行&amp;quot;的经典问题。本文将深入剖析 Docker 的各个核心组件，从底层原理到实际应用，帮助运维工程师全面理解并高效使用 Docker。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>CAP 理论实战指南：分布式系统的权衡艺术</title>
+      <link>http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/</link>
+      <pubDate>Mon, 16 Feb 2026 15:56:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;如果你是 DevOps 工程师或 SRE，你肯定遇到过这样的场景：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;凌晨 3 点，数据库主从延迟了 5 秒，用户投诉看到了过期数据&lt;/li&gt;
+&lt;li&gt;网络抖动导致集群脑裂，一半节点拒绝写入，另一半正常服务&lt;/li&gt;
+&lt;li&gt;产品经理要求&amp;quot;既要高可用，又要强一致性&amp;quot;，你该如何回应？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这些都是 CAP 理论在真实世界的具体体现。&lt;strong&gt;CAP 不是学术论文里的概念，而是每个运维人员每天都在面对的技术选择。&lt;/strong&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetes Finally Explained - With Diagrams That Actually Make Sense</title>
+      <link>http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/</link>
+      <pubDate>Mon, 16 Feb 2026 14:44:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-kubernetes-explained-with-diagrams/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771257558316_image.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;a-visual-journey-through-container-orchestration&#34;&gt;A Visual Journey Through Container Orchestration&lt;/h2&gt;
+&lt;p&gt;Kubernetes often feels overwhelming at first - not because it&amp;rsquo;s poorly designed, but because most explanations jump straight into YAML and commands.&lt;/p&gt;
+&lt;p&gt;This article takes a visual + conceptual approach to explain why Kubernetes exists, how it works internally, and how all major components fit together.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;If you understand the mental model, Kubernetes becomes logical - even elegant.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;the-container-revolution-how-we-got-here&#34;&gt;The Container Revolution: How We Got Here&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771257117195_image.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>深入理解 Linux 启动过程：从 BIOS 到用户登录</title>
+      <link>http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/</link>
+      <pubDate>Mon, 16 Feb 2026 14:29:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Linux 系统的启动过程是一个复杂而精密的过程，涉及固件、引导加载器、内核、init 系统等多个组件的协同工作。对于运维工程师来说，深入理解启动过程不仅有助于快速定位系统启动故障，还能优化启动性能、实现系统定制化配置。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>Kubernetes 深度解析：为什么它成为容器编排的事实标准？</title>
+      <link>http://localhost:1313/posts/2026-02-15-kubernetes-deep-dive/</link>
+      <pubDate>Sun, 15 Feb 2026 11:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-15-kubernetes-deep-dive/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771166552159_k8s_blog_800w.jpg&#34; alt=&#34;k8s_blog_800w.jpg&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在云原生时代，Kubernetes（简称 K8s）已经成为容器编排领域的事实标准。从初创公司到 Google、Netflix 等科技巨头，无数组织都在使用 K8s 管理他们的容器化应用。作为运维工程师，深入理解 K8s 的架构和运作机制，已经成为必备技能。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>系统设计：为什么 Kafka 如此流行？</title>
+      <link>http://localhost:1313/posts/2026-02-15-kafka-system-design/</link>
+      <pubDate>Sun, 15 Feb 2026 10:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-15-kafka-system-design/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771165068791_kafka.jpg&#34; alt=&#34;kafka.jpg&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Apache Kafka 已经成为现代分布式系统中不可或缺的组件。LinkedIn、Netflix、Uber 等公司每天使用 Kafka 处理数十亿条消息。作为运维人员，深入理解 Kafka 的架构和工作原理对于系统的稳定运行至关重要。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

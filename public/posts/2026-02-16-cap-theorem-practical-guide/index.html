@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">CAP 理论实战指南：分布式系统的权衡艺术 | 我的技术博客</title>
+<meta property="og:title" content="CAP 理论实战指南：分布式系统的权衡艺术 | 我的技术博客" />
+<meta name="twitter:title" content="CAP 理论实战指南：分布式系统的权衡艺术 | 我的技术博客" />
+<meta itemprop="name" content="CAP 理论实战指南：分布式系统的权衡艺术 | 我的技术博客" />
+<meta name="application-name" content="CAP 理论实战指南：分布式系统的权衡艺术 | 我的技术博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="从运维视角深入理解 CAP 理论，学会在一致性和可用性之间做出正确的权衡选择">
+<meta itemprop="description" content="从运维视角深入理解 CAP 理论，学会在一致性和可用性之间做出正确的权衡选择" />
+<meta property="og:description" content="从运维视角深入理解 CAP 理论，学会在一致性和可用性之间做出正确的权衡选择" />
+<meta name="twitter:description" content="从运维视角深入理解 CAP 理论，学会在一致性和可用性之间做出正确的权衡选择" />
+
+<meta property="og:locale" content="zh" />
+<meta name="language" content="zh" />
+
+  <link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/" title="中文" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-02-16T15:56:00&#43;0800 />
+    <meta property="article:published_time" content=2026-02-16T15:56:00&#43;0800 />
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/" />
+
+    
+    <meta property="og:article:author" content="Kaka" />
+    <meta property="article:author" content="Kaka" />
+    <meta name="author" content="Kaka" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "CAP 理论实战指南：分布式系统的权衡艺术",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-02-16",
+        "description": "从运维视角深入理解 CAP 理论，学会在一致性和可用性之间做出正确的权衡选择",
+        "wordCount":  3951 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-02-16",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "我的技术博客"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.154.3">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/">
+  <meta property="og:site_name" content="我的技术博客">
+  <meta property="og:title" content="CAP 理论实战指南：分布式系统的权衡艺术">
+  <meta property="og:description" content="从运维视角深入理解 CAP 理论，学会在一致性和可用性之间做出正确的权衡选择">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-16T15:56:00+08:00">
+    <meta property="article:modified_time" content="2026-02-16T15:56:00+08:00">
+    <meta property="article:tag" content="分布式系统">
+    <meta property="article:tag" content="CAP">
+    <meta property="article:tag" content="Devops">
+    <meta property="article:tag" content="数据库">
+    <meta property="article:tag" content="架构">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CAP 理论实战指南：分布式系统的权衡艺术">
+  <meta name="twitter:description" content="从运维视角深入理解 CAP 理论，学会在一致性和可用性之间做出正确的权衡选择">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/">
+    <link href="/style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title></title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        首页
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/posts/">
+                        文章
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/tags/">
+                        标签
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">CAP 理论实战指南：分布式系统的权衡艺术</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-02-16T15:56:00&#43;08:00" itemprop="datePublished"> 2026年2月16日 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b></b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#cap-理论的本质">CAP 理论的本质</a>
+      <ul>
+        <li><a href="#一句话总结">一句话总结</a></li>
+        <li><a href="#为什么是三选二">为什么是&quot;三选二&quot;？</a></li>
+      </ul>
+    </li>
+    <li><a href="#cap-三要素详解">CAP 三要素详解</a>
+      <ul>
+        <li><a href="#c---consistency-一致性">C - Consistency (一致性)</a></li>
+        <li><a href="#a---availability-可用性">A - Availability (可用性)</a></li>
+        <li><a href="#p---partition-tolerance-分区容错性">P - Partition Tolerance (分区容错性)</a></li>
+      </ul>
+    </li>
+    <li><a href="#cp-vs-ap如何选择">CP vs AP：如何选择？</a>
+      <ul>
+        <li><a href="#cp-系统宁可拒绝不愿出错">CP 系统：宁可拒绝，不愿出错</a></li>
+        <li><a href="#ap-系统宁可暂时错误不愿拒绝服务">AP 系统：宁可暂时错误，不愿拒绝服务</a></li>
+      </ul>
+    </li>
+    <li><a href="#混合架构在同一系统中使用-cp-和-ap">混合架构：在同一系统中使用 CP 和 AP</a>
+      <ul>
+        <li><a href="#电商系统架构示例">电商系统架构示例</a></li>
+        <li><a href="#决策树如何选择-cp-还是-ap">决策树：如何选择 CP 还是 AP</a></li>
+      </ul>
+    </li>
+    <li><a href="#监控和故障演练">监控和故障演练</a>
+      <ul>
+        <li><a href="#cp-系统监控指标">CP 系统监控指标</a></li>
+        <li><a href="#ap-系统监控指标">AP 系统监控指标</a></li>
+        <li><a href="#故障演练脚本">故障演练脚本</a></li>
+      </ul>
+    </li>
+    <li><a href="#常见误区">常见误区</a>
+      <ul>
+        <li><a href="#误区-1ca-系统存在">误区 1：&ldquo;CA 系统存在&rdquo;</a></li>
+        <li><a href="#误区-2最终一致性数据会丢失">误区 2：&ldquo;最终一致性=数据会丢失&rdquo;</a></li>
+        <li><a href="#误区-3cp-系统总是慢">误区 3：&ldquo;CP 系统总是慢&rdquo;</a></li>
+      </ul>
+    </li>
+    <li><a href="#实战建议">实战建议</a>
+      <ul>
+        <li><a href="#1-默认选择-ap除非有充分理由选择-cp">1. 默认选择 AP，除非有充分理由选择 CP</a></li>
+        <li><a href="#2-使用读写分离优化性能">2. 使用读写分离优化性能</a></li>
+        <li><a href="#3-分层设计核心用-cp外围用-ap">3. 分层设计：核心用 CP，外围用 AP</a></li>
+        <li><a href="#4-监控和告警是关键">4. 监控和告警是关键</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+    <li><a href="#参考资料">参考资料</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="引言">引言</h2>
+<p>如果你是 DevOps 工程师或 SRE，你肯定遇到过这样的场景：</p>
+<ul>
+<li>凌晨 3 点，数据库主从延迟了 5 秒，用户投诉看到了过期数据</li>
+<li>网络抖动导致集群脑裂，一半节点拒绝写入，另一半正常服务</li>
+<li>产品经理要求&quot;既要高可用，又要强一致性&quot;，你该如何回应？</li>
+</ul>
+<p>这些都是 CAP 理论在真实世界的具体体现。<strong>CAP 不是学术论文里的概念，而是每个运维人员每天都在面对的技术选择。</strong></p>
+<p>本文将从实战角度，帮你彻底理解 CAP 理论，并学会在一致性（Consistency）、可用性（Availability）和分区容错性（Partition Tolerance）之间做出正确的权衡。</p>
+<h2 id="cap-理论的本质">CAP 理论的本质</h2>
+<h3 id="一句话总结">一句话总结</h3>
+<p><strong>在分布式系统发生网络分区时，你只能在一致性和可用性之间选择一个。你不可能两者兼得。</strong></p>
+<h3 id="为什么是三选二">为什么是&quot;三选二&quot;？</h3>
+<p>很多文章会说 CAP 是&quot;三选二&quot;，但这其实<strong>不准确</strong>。</p>
+<p>正确的理解是：</p>
+<pre tabindex="0"><code>P (分区容错性) 是必选项
+↓
+网络分区一定会发生
+↓
+你必须在 C 和 A 之间选择
+</code></pre><p><strong>网络分区不是&quot;如果发生&quot;，而是&quot;何时发生&quot;的问题。</strong></p>
+<p>光纤会被施工队挖断、交换机会宕机、防火墙规则会出错、云服务商会出故障。作为运维，你必须假设分区会发生，并提前决定系统的行为。</p>
+<h2 id="cap-三要素详解">CAP 三要素详解</h2>
+<h3 id="c---consistency-一致性">C - Consistency (一致性)</h3>
+<p><strong>定义</strong>：所有节点在同一时刻看到的数据是一致的。</p>
+<h4 id="实际表现">实际表现</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 场景：用户在节点 A 修改了密码</span>
+</span></span><span style="display:flex;"><span>node-A: password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;new_password&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 强一致性要求</span>
+</span></span><span style="display:flex;"><span>node-B: password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;new_password&#34;</span>  ✅ 立即生效
+</span></span><span style="display:flex;"><span>node-C: password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;new_password&#34;</span>  ✅ 立即生效
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 如果无法保证，宁愿返回错误</span>
+</span></span><span style="display:flex;"><span>node-D: <span style="color:#e6db74">&#34;Error: Unable to confirm write&#34;</span> ❌
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="运维实现">运维实现</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 写操作必须等待多数节点确认</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">write_data</span>(key, value):
+</span></span><span style="display:flex;"><span>    nodes_confirmed <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> node <span style="color:#f92672">in</span> cluster_nodes:
+</span></span><span style="display:flex;"><span>        result <span style="color:#f92672">=</span> node<span style="color:#f92672">.</span>write(key, value)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>success:
+</span></span><span style="display:flex;"><span>            nodes_confirmed<span style="color:#f92672">.</span>append(node)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 必须多数节点确认才算成功</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len(nodes_confirmed) <span style="color:#f92672">&gt;</span> len(cluster_nodes) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;SUCCESS&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        rollback(nodes_confirmed, key)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;FAILED&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="适用场景">适用场景</h4>
+<ul>
+<li><strong>金融交易</strong>：账户余额、转账记录</li>
+<li><strong>库存管理</strong>：商品库存、秒杀活动</li>
+<li><strong>权限控制</strong>：用户权限、Token 管理</li>
+</ul>
+<h3 id="a---availability-可用性">A - Availability (可用性)</h3>
+<p><strong>定义</strong>：每个请求都能收到响应（成功或失败），而不是超时或挂起。</p>
+<h4 id="实际表现-1">实际表现</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 即使部分节点失联，系统仍然响应</span>
+</span></span><span style="display:flex;"><span>node-A: status <span style="color:#f92672">=</span> UP, response <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;OK&#34;</span>
+</span></span><span style="display:flex;"><span>node-B: status <span style="color:#f92672">=</span> UNREACHABLE, -
+</span></span><span style="display:flex;"><span>node-C: status <span style="color:#f92672">=</span> UP, response <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;OK&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 用户请求总能得到答复</span>
+</span></span><span style="display:flex;"><span>user_request → node-A → <span style="color:#e6db74">&#34;Here is your data&#34;</span> <span style="color:#f92672">(</span>可能稍旧<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>user_request → node-C → <span style="color:#e6db74">&#34;Here is your data&#34;</span> <span style="color:#f92672">(</span>可能稍旧<span style="color:#f92672">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="运维实现-1">运维实现</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 读操作只要有一个节点响应即可</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">read_data</span>(key):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> node <span style="color:#f92672">in</span> cluster_nodes:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> node<span style="color:#f92672">.</span>read(key, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>ms)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> result:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> result  <span style="color:#75715e"># 立即返回，不管其他节点</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">TimeoutError</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>  <span style="color:#75715e"># 跳过超时节点</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Service Unavailable&#34;</span>  <span style="color:#75715e"># 所有节点都挂了才报错</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="适用场景-1">适用场景</h4>
+<ul>
+<li><strong>社交媒体</strong>：点赞数、评论数、关注数</li>
+<li><strong>内容分发</strong>：新闻推送、视频流</li>
+<li><strong>日志收集</strong>：监控指标、应用日志</li>
+</ul>
+<h3 id="p---partition-tolerance-分区容错性">P - Partition Tolerance (分区容错性)</h3>
+<p><strong>定义</strong>：系统在网络分区发生时仍能继续运行。</p>
+<h4 id="实际表现-2">实际表现</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 网络分区发生</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>北京机房<span style="color:#f92672">]</span> ←-✗-→ <span style="color:#f92672">[</span>上海机房<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    ↓                 ↓
+</span></span><span style="display:flex;"><span>  可访问            可访问
+</span></span><span style="display:flex;"><span>    ↓                 ↓
+</span></span><span style="display:flex;"><span>用户 A 访问        用户 B 访问
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="为什么-p-是必选项">为什么 P 是必选项</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">网络故障类型</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">机房间专线中断</span>: <span style="color:#ae81ff">每年 1-2 次</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">云服务商故障</span>: <span style="color:#ae81ff">每年几次</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">交换机宕机</span>: <span style="color:#ae81ff">随时可能</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">配置错误</span>: <span style="color:#ae81ff">人为失误</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">DDoS 攻击</span>: <span style="color:#ae81ff">外部威胁</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">结论</span>: <span style="color:#ae81ff">不是&#34;如果&#34;发生，而是&#34;何时&#34;发生</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="cp-vs-ap如何选择">CP vs AP：如何选择？</h2>
+<h3 id="cp-系统宁可拒绝不愿出错">CP 系统：宁可拒绝，不愿出错</h3>
+<h4 id="核心理念">核心理念</h4>
+<pre tabindex="0"><code>一致性 &gt; 可用性
+正确性 &gt; 响应时间
+拒绝请求 &gt; 返回错误数据
+</code></pre><h4 id="故障模式">故障模式</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 网络分区发生时</span>
+</span></span><span style="display:flex;"><span>少数派分区: 拒绝所有写操作 ❌
+</span></span><span style="display:flex;"><span>多数派分区: 继续接受写操作 ✅
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 用户体验</span>
+</span></span><span style="display:flex;"><span>请求 → <span style="color:#e6db74">&#34;Error: 503 Service Temporarily Unavailable&#34;</span>
+</span></span><span style="display:flex;"><span>请求 → <span style="color:#e6db74">&#34;Error: Write timeout, please retry&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="典型-cp-系统配置">典型 CP 系统配置</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># MongoDB 配置</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">replication</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">replSetName</span>: <span style="color:#e6db74">&#34;rs0&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">writeConcern</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">w</span>: <span style="color:#e6db74">&#34;majority&#34;</span>  <span style="color:#75715e"># 多数节点确认</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">j</span>: <span style="color:#66d9ef">true</span>        <span style="color:#75715e"># 写入 journal</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">wtimeout</span>: <span style="color:#ae81ff">5000</span> <span style="color:#75715e"># 5 秒超时</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 结果</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 写操作慢但可靠</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 少数派分区拒绝写入</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 数据永远一致</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="实战案例支付系统">实战案例：支付系统</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 扣款操作必须是 CP</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">deduct_balance</span>(user_id, amount):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 开启分布式事务</span>
+</span></span><span style="display:flex;"><span>    transaction <span style="color:#f92672">=</span> start_transaction()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 必须所有节点确认</span>
+</span></span><span style="display:flex;"><span>        balance <span style="color:#f92672">=</span> get_balance(user_id, consistency<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;STRONG&#34;</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> balance <span style="color:#f92672">&lt;</span> amount:
+</span></span><span style="display:flex;"><span>            transaction<span style="color:#f92672">.</span>rollback()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Insufficient balance&#34;</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 扣款</span>
+</span></span><span style="display:flex;"><span>        new_balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">-</span> amount
+</span></span><span style="display:flex;"><span>        update_balance(user_id, new_balance, consistency<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;STRONG&#34;</span>)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 提交（等待多数节点确认）</span>
+</span></span><span style="display:flex;"><span>        transaction<span style="color:#f92672">.</span>commit(timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Success&#34;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">TimeoutError</span>:
+</span></span><span style="display:flex;"><span>        transaction<span style="color:#f92672">.</span>rollback()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Payment failed, please retry&#34;</span>  <span style="color:#75715e"># 宁愿失败</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>为什么选择 CP</strong>：</p>
+<ul>
+<li>不能重复扣款</li>
+<li>余额不能为负</li>
+<li>宁愿支付失败，也不能出错</li>
+</ul>
+<h3 id="ap-系统宁可暂时错误不愿拒绝服务">AP 系统：宁可暂时错误，不愿拒绝服务</h3>
+<h4 id="核心理念-1">核心理念</h4>
+<pre tabindex="0"><code>可用性 &gt; 一致性
+响应速度 &gt; 数据精确性
+最终一致 &gt; 强一致
+</code></pre><h4 id="故障模式-1">故障模式</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 网络分区发生时</span>
+</span></span><span style="display:flex;"><span>分区 A: 继续接受读写 ✅
+</span></span><span style="display:flex;"><span>分区 B: 继续接受读写 ✅
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 分区恢复后</span>
+</span></span><span style="display:flex;"><span>系统自动合并数据（冲突解决）
+</span></span><span style="display:flex;"><span>最终达到一致状态
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="典型-ap-系统配置">典型 AP 系统配置</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Cassandra 配置</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">read_consistency</span>: <span style="color:#ae81ff">ONE   </span> <span style="color:#75715e"># 任意一个节点响应即可</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">write_consistency</span>: <span style="color:#ae81ff">ONE  </span> <span style="color:#75715e"># 写入一个节点即返回成功</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">replication_factor</span>: <span style="color:#ae81ff">3</span>    <span style="color:#75715e"># 数据复制 3 份</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 结果</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 读写极快</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 分区时仍可用</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 数据最终一致</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="实战案例社交媒体点赞">实战案例：社交媒体点赞</h4>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 点赞功能可以是 AP</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">like_post</span>(post_id, user_id):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 写入本地节点即可</span>
+</span></span><span style="display:flex;"><span>    local_node<span style="color:#f92672">.</span>increment(<span style="color:#e6db74">&#34;post:</span><span style="color:#e6db74">{post_id}</span><span style="color:#e6db74">:likes&#34;</span>)
+</span></span><span style="display:flex;"><span>    local_node<span style="color:#f92672">.</span>add_to_set(<span style="color:#e6db74">&#34;post:</span><span style="color:#e6db74">{post_id}</span><span style="color:#e6db74">:likers&#34;</span>, user_id)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 异步同步到其他节点</span>
+</span></span><span style="display:flex;"><span>    async_replicate_to_other_nodes()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Success&#34;</span>  <span style="color:#75715e"># 立即返回</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_like_count</span>(post_id):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 从最近的节点读取</span>
+</span></span><span style="display:flex;"><span>    count <span style="color:#f92672">=</span> nearest_node<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;post:</span><span style="color:#e6db74">{post_id}</span><span style="color:#e6db74">:likes&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> count  <span style="color:#75715e"># 可能稍微过期几秒</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>为什么选择 AP</strong>：</p>
+<ul>
+<li>用户看到&quot;99 个赞&quot;还是&quot;100 个赞&quot;无关紧要</li>
+<li>快速响应比绝对精确更重要</li>
+<li>几秒后数据会自动同步</li>
+</ul>
+<h2 id="混合架构在同一系统中使用-cp-和-ap">混合架构：在同一系统中使用 CP 和 AP</h2>
+<p>真实的生产系统通常不是纯 CP 或纯 AP，而是<strong>根据不同业务场景混合使用</strong>。</p>
+<h3 id="电商系统架构示例">电商系统架构示例</h3>
+<pre tabindex="0"><code>┌─────────────────────────────────────────┐
+│         电商系统架构                      │
+├─────────────────────────────────────────┤
+│                                         │
+│  [用户服务] ─────→ CP 系统              │
+│   - 登录认证          (MySQL/主从)       │
+│   - 密码修改          write_concern=all  │
+│   - 权限验证                            │
+│                                         │
+│  [订单服务] ─────→ CP 系统              │
+│   - 下单                (PostgreSQL)     │
+│   - 支付                strong_consistency│
+│   - 库存扣减                            │
+│                                         │
+│  [推荐服务] ─────→ AP 系统              │
+│   - 浏览历史          (Cassandra)        │
+│   - 商品推荐          eventual_consistency│
+│   - 个性化展示                          │
+│                                         │
+│  [统计服务] ─────→ AP 系统              │
+│   - 浏览量             (Redis + Kafka)   │
+│   - 销量排行          async_replication  │
+│   - 用户行为分析                        │
+│                                         │
+└─────────────────────────────────────────┘
+</code></pre><h3 id="决策树如何选择-cp-还是-ap">决策树：如何选择 CP 还是 AP</h3>
+<pre tabindex="0"><code>开始
+  │
+  ├─→ 数据不一致会造成经济损失？
+  │     └─→ 是 → 选择 CP（订单、支付、库存）
+  │
+  ├─→ 数据不一致会造成安全问题？
+  │     └─→ 是 → 选择 CP（权限、认证、Token）
+  │
+  ├─→ 数据不一致用户会投诉？
+  │     └─→ 是 → 选择 CP（账户信息、会员等级）
+  │
+  └─→ 以上都不是
+        └─→ 选择 AP（点赞、浏览量、推荐、日志）
+</code></pre><h2 id="监控和故障演练">监控和故障演练</h2>
+<h3 id="cp-系统监控指标">CP 系统监控指标</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Prometheus 配置</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 监控写入拒绝率</span>
+</span></span><span style="display:flex;"><span>- record: db_write_rejection_rate
+</span></span><span style="display:flex;"><span>  expr: rate<span style="color:#f92672">(</span>db_write_errors_total<span style="color:#f92672">{</span>reason<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;quorum_not_met&#34;</span><span style="color:#f92672">}[</span>5m<span style="color:#f92672">])</span>
+</span></span><span style="display:flex;"><span>  alert: WriteRejectionHigh
+</span></span><span style="display:flex;"><span>  threshold: &gt; 0.01  <span style="color:#75715e"># 超过 1% 告警</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 监控集群分区</span>
+</span></span><span style="display:flex;"><span>- record: cluster_partitions
+</span></span><span style="display:flex;"><span>  expr: count<span style="color:#f92672">(</span>db_node_status<span style="color:#f92672">{</span>status<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;unreachable&#34;</span><span style="color:#f92672">})</span>
+</span></span><span style="display:flex;"><span>  alert: ClusterPartitioned
+</span></span><span style="display:flex;"><span>  threshold: &gt; <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 监控写入延迟</span>
+</span></span><span style="display:flex;"><span>- record: write_latency_p99
+</span></span><span style="display:flex;"><span>  expr: histogram_quantile<span style="color:#f92672">(</span>0.99, db_write_duration_seconds<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>  alert: WriteLatencyHigh
+</span></span><span style="display:flex;"><span>  threshold: &gt; 1s  <span style="color:#75715e"># P99 超过 1 秒告警</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="ap-系统监控指标">AP 系统监控指标</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 监控数据同步延迟</span>
+</span></span><span style="display:flex;"><span>- record: replication_lag_seconds
+</span></span><span style="display:flex;"><span>  expr: db_replication_lag_seconds
+</span></span><span style="display:flex;"><span>  alert: ReplicationLagHigh
+</span></span><span style="display:flex;"><span>  threshold: &gt; <span style="color:#ae81ff">60</span>  <span style="color:#75715e"># 超过 60 秒告警</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 监控冲突解决次数</span>
+</span></span><span style="display:flex;"><span>- record: conflict_resolution_rate
+</span></span><span style="display:flex;"><span>  expr: rate<span style="color:#f92672">(</span>db_conflicts_resolved_total<span style="color:#f92672">[</span>5m<span style="color:#f92672">])</span>
+</span></span><span style="display:flex;"><span>  alert: ConflictRateHigh
+</span></span><span style="display:flex;"><span>  threshold: &gt; <span style="color:#ae81ff">10</span>  <span style="color:#75715e"># 每分钟超过 10 次告警</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 监控读取不一致</span>
+</span></span><span style="display:flex;"><span>- record: read_inconsistency_rate
+</span></span><span style="display:flex;"><span>  expr: rate<span style="color:#f92672">(</span>db_stale_reads_total<span style="color:#f92672">[</span>5m<span style="color:#f92672">])</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="故障演练脚本">故障演练脚本</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">44
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">45
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"># chaos_test.sh - CAP 理论故障演练</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;=== CAP 故障演练开始 ===&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 识别当前集群状态</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;步骤 1: 检查集群状态&#34;</span>
+</span></span><span style="display:flex;"><span>kubectl get pods -n database
+</span></span><span style="display:flex;"><span>db_nodes<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>kubectl get pods -n database -l app<span style="color:#f92672">=</span>mongodb -o name<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 模拟网络分区</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;步骤 2: 模拟网络分区（隔离 1/3 节点）&#34;</span>
+</span></span><span style="display:flex;"><span>minority_node<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$db_nodes<span style="color:#e6db74">&#34;</span> | head -n 1<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>kubectl exec $minority_node -- iptables -A INPUT -j DROP -p tcp --dport <span style="color:#ae81ff">27017</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;网络分区已创建: </span>$minority_node<span style="color:#e6db74"> 已隔离&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 测试 CP 系统行为</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;步骤 3: 测试写入操作（预期：少数派拒绝）&#34;</span>
+</span></span><span style="display:flex;"><span>kubectl exec $minority_node -- mongo --eval <span style="color:#e6db74">&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  db.test.insertOne({test: &#34;data&#34;})
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">||</span> echo <span style="color:#e6db74">&#34;✅ 少数派正确拒绝写入&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 测试多数派</span>
+</span></span><span style="display:flex;"><span>majority_node<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>echo <span style="color:#e6db74">&#34;</span>$db_nodes<span style="color:#e6db74">&#34;</span> | tail -n 1<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;步骤 4: 测试多数派写入（预期：成功）&#34;</span>
+</span></span><span style="display:flex;"><span>kubectl exec $majority_node -- mongo --eval <span style="color:#e6db74">&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  db.test.insertOne({test: &#34;data&#34;})
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">&amp;&amp;</span> echo <span style="color:#e6db74">&#34;✅ 多数派正常接受写入&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 5. 恢复网络</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;步骤 5: 恢复网络分区&#34;</span>
+</span></span><span style="display:flex;"><span>kubectl exec $minority_node -- iptables -F
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sleep <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 6. 验证数据一致性</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;步骤 6: 验证数据最终一致&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> node in $db_nodes; <span style="color:#66d9ef">do</span>
+</span></span><span style="display:flex;"><span>  count<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>kubectl exec $node -- mongo --quiet --eval <span style="color:#e6db74">&#39;db.test.count()&#39;</span><span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>  echo <span style="color:#e6db74">&#34;节点 </span>$node<span style="color:#e6db74">: </span>$count<span style="color:#e6db74"> 条记录&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">done</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;=== 演练完成 ===&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="常见误区">常见误区</h2>
+<h3 id="误区-1ca-系统存在">误区 1：&ldquo;CA 系统存在&rdquo;</h3>
+<p><strong>错误观点</strong>：单机数据库是 CA 系统。</p>
+<p><strong>正确理解</strong>：单机不是分布式系统，CAP 不适用。一旦需要多节点，P 就成为必选项。</p>
+<h3 id="误区-2最终一致性数据会丢失">误区 2：&ldquo;最终一致性=数据会丢失&rdquo;</h3>
+<p><strong>错误观点</strong>：AP 系统的数据不可靠。</p>
+<p><strong>正确理解</strong>：最终一致性不是&quot;可能不一致&quot;，而是&quot;暂时不一致，但最终会一致&quot;。数据不会丢失，只是同步有延迟。</p>
+<h3 id="误区-3cp-系统总是慢">误区 3：&ldquo;CP 系统总是慢&rdquo;</h3>
+<p><strong>错误观点</strong>：选择 CP 就意味着性能差。</p>
+<p><strong>正确理解</strong>：CP 只是在分区时牺牲可用性。正常情况下，CP 系统可以很快。关键在于优化写入路径。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># CP 系统优化：异步复制 + 同步确认</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">optimized_cp_write</span>(key, value):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 写入本地（快）</span>
+</span></span><span style="display:flex;"><span>    local_node<span style="color:#f92672">.</span>write(key, value)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 异步复制到其他节点</span>
+</span></span><span style="display:flex;"><span>    replication_futures <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> node <span style="color:#f92672">in</span> other_nodes:
+</span></span><span style="display:flex;"><span>        future <span style="color:#f92672">=</span> async_replicate(node, key, value)
+</span></span><span style="display:flex;"><span>        replication_futures<span style="color:#f92672">.</span>append(future)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 等待多数确认（并行，不是串行）</span>
+</span></span><span style="display:flex;"><span>    wait_for_majority(replication_futures, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">100</span>ms)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Success&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="实战建议">实战建议</h2>
+<h3 id="1-默认选择-ap除非有充分理由选择-cp">1. 默认选择 AP，除非有充分理由选择 CP</h3>
+<p>大部分业务场景可以容忍短暂的数据不一致。只有涉及金钱、安全、合规的场景才真正需要 CP。</p>
+<h3 id="2-使用读写分离优化性能">2. 使用读写分离优化性能</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># CP 系统中使用读副本</span>
+</span></span><span style="display:flex;"><span>写操作 → 主节点（CP，强一致性）
+</span></span><span style="display:flex;"><span>读操作 → 从节点（AP，允许稍微延迟）
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-分层设计核心用-cp外围用-ap">3. 分层设计：核心用 CP，外围用 AP</h3>
+<pre tabindex="0"><code>[订单核心] → CP（PostgreSQL）
+     ↓
+[订单缓存] → AP（Redis）← 用户查询
+</code></pre><h3 id="4-监控和告警是关键">4. 监控和告警是关键</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 永远监控这两个指标</span>
+</span></span><span style="display:flex;"><span>1. 数据同步延迟（AP 系统）
+</span></span><span style="display:flex;"><span>2. 写入拒绝率（CP 系统）
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="总结">总结</h2>
+<p>CAP 理论不是让你在技术架构之间选择，而是让你<strong>理解分布式系统的固有限制</strong>。</p>
+<p>关键要记住：</p>
+<ol>
+<li><strong>P 是必选项</strong>：网络分区一定会发生</li>
+<li><strong>在 C 和 A 之间选择</strong>：一致性 vs 可用性</li>
+<li><strong>没有完美方案</strong>：只有适合业务场景的权衡</li>
+<li><strong>混合使用</strong>：不同业务用不同策略</li>
+</ol>
+<p>作为 DevOps 和 SRE，你的职责是：</p>
+<ul>
+<li>✅ 理解每个服务的 CAP 选择</li>
+<li>✅ 监控系统在分区时的行为</li>
+<li>✅ 定期进行故障演练</li>
+<li>✅ 向产品和业务解释技术权衡</li>
+</ul>
+<p><strong>最后一句话</strong>：CAP 理论告诉我们，完美的分布式系统不存在，但理解权衡后，你可以设计出足够好的系统。</p>
+<h2 id="参考资料">参考资料</h2>
+<ul>
+<li><a href="https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html">CAP Theorem - Martin Kleppmann</a></li>
+<li><a href="https://dataintensive.net/">Designing Data-Intensive Applications</a></li>
+<li><a href="https://jepsen.io/">Jepsen: Distributed Systems Safety Research</a></li>
+<li><a href="https://docs.mongodb.com/manual/core/read-isolation-consistency-recency/">MongoDB Consistency Model</a></li>
+<li><a href="https://cassandra.apache.org/doc/latest/architecture/">Cassandra Architecture</a></li>
+</ul>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/kaka-milan-22" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/kaka99859362" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+<a href="mailto:kaka@kakacn.com" target="_blank" rel="noopener noreferrer me"
+    title="Email">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2026 Kaka.
+        
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>反向代理 on 我的技术博客</title>
+    <link>http://localhost:1313/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/</link>
+    <description>Recent content in 反向代理 on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sat, 14 Feb 2026 10:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Nginx工作原理全解析：从请求到响应的完整旅程</title>
+      <link>http://localhost:1313/posts/2026-02-14-nginx-complete-guide/</link>
+      <pubDate>Sat, 14 Feb 2026 10:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-14-nginx-complete-guide/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771052340831_nginx.jpeg&#34; alt=&#34;nginx.jpeg&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;开场那台永不宕机的服务器&#34;&gt;开场：那台永不宕机的服务器&lt;/h2&gt;
+&lt;p&gt;2019年，我加入一家电商公司，第一天就听到一个传说：&amp;ldquo;我们的Nginx服务器三年没重启过，每秒处理10万请求，CPU占用不到20%。&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;我当时不信。一台服务器，怎么可能这么猛？&lt;/p&gt;
+&lt;p&gt;后来，我真正理解Nginx的时候，我才知道：这不是传说，这是现实。&lt;/p&gt;
+&lt;p&gt;今天，全球前1000万个网站中，超过&lt;strong&gt;30%在用Nginx&lt;/strong&gt;。Netflix、Airbnb、GitHub、WordPress.com……这些你天天在用的网站，背后都是Nginx。&lt;/p&gt;
+&lt;p&gt;它为什么这么受欢迎？它是如何工作的？让我们从一个HTTP请求的完整生命周期说起。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="zh"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">数据库ACID原理深度解析：从理论到实践的完整指南 | 我的技术博客</title>
+<meta property="og:title" content="数据库ACID原理深度解析：从理论到实践的完整指南 | 我的技术博客" />
+<meta name="twitter:title" content="数据库ACID原理深度解析：从理论到实践的完整指南 | 我的技术博客" />
+<meta itemprop="name" content="数据库ACID原理深度解析：从理论到实践的完整指南 | 我的技术博客" />
+<meta name="application-name" content="数据库ACID原理深度解析：从理论到实践的完整指南 | 我的技术博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱">
+<meta itemprop="description" content="深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱" />
+<meta property="og:description" content="深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱" />
+<meta name="twitter:description" content="深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱" />
+
+<meta property="og:locale" content="zh" />
+<meta name="language" content="zh" />
+
+  <link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-01-13-acid-database-principles/" title="中文" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-02-14T02:00:00&#43;0800 />
+    <meta property="article:published_time" content=2026-02-14T02:00:00&#43;0800 />
+    <meta property="og:url" content="http://localhost:1313/posts/2026-01-13-acid-database-principles/" />
+
+    
+    <meta property="og:article:author" content="Kaka" />
+    <meta property="article:author" content="Kaka" />
+    <meta name="author" content="Kaka" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "数据库ACID原理深度解析：从理论到实践的完整指南",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-02-14",
+        "description": "深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱",
+        "wordCount":  7079 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-02-14",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "我的技术博客"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.154.3">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/2026-01-13-acid-database-principles/">
+  <meta property="og:site_name" content="我的技术博客">
+  <meta property="og:title" content="数据库ACID原理深度解析：从理论到实践的完整指南">
+  <meta property="og:description" content="深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-14T02:00:00+08:00">
+    <meta property="article:modified_time" content="2026-02-14T02:00:00+08:00">
+    <meta property="article:tag" content="数据库">
+    <meta property="article:tag" content="ACID">
+    <meta property="article:tag" content="事务">
+    <meta property="article:tag" content="隔离级别">
+    <meta property="article:tag" content="MySQL">
+    <meta property="article:tag" content="PostgreSQL">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="数据库ACID原理深度解析：从理论到实践的完整指南">
+  <meta name="twitter:description" content="深入理解关系数据库的ACID特性：原子性、一致性、隔离性、持久性，以及开发中的最佳实践和常见陷阱">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/2026-01-13-acid-database-principles/">
+    <link href="/style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title></title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        首页
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/posts/">
+                        文章
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/tags/">
+                        标签
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">数据库ACID原理深度解析：从理论到实践的完整指南</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-02-14T02:00:00&#43;08:00" itemprop="datePublished"> 2026年2月14日 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b></b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#开场那笔消失的转账">开场：那笔消失的转账</a></li>
+    <li><a href="#第一章什么是acid">第一章：什么是ACID？</a>
+      <ul>
+        <li><a href="#什么是事务">什么是事务？</a></li>
+      </ul>
+    </li>
+    <li><a href="#第二章a---原子性atomicity">第二章：A - 原子性（Atomicity）</a>
+      <ul>
+        <li><a href="#定义要么全做要么全不做">定义：要么全做，要么全不做</a></li>
+        <li><a href="#实际例子银行转账">实际例子：银行转账</a></li>
+        <li><a href="#原子性是如何实现的">原子性是如何实现的？</a></li>
+      </ul>
+    </li>
+    <li><a href="#第三章c---一致性consistency">第三章：C - 一致性（Consistency）</a>
+      <ul>
+        <li><a href="#定义保持数据库的完整性约束">定义：保持数据库的完整性约束</a></li>
+        <li><a href="#例子1账户总额不变">例子1：账户总额不变</a></li>
+        <li><a href="#例子2数据库约束">例子2：数据库约束</a></li>
+        <li><a href="#例子3外键约束">例子3：外键约束</a></li>
+        <li><a href="#一致性的层次">一致性的层次</a></li>
+      </ul>
+    </li>
+    <li><a href="#第四章i---隔离性isolation">第四章：I - 隔离性（Isolation）</a>
+      <ul>
+        <li><a href="#定义并发事务互不干扰">定义：并发事务互不干扰</a></li>
+        <li><a href="#为什么需要隔离">为什么需要隔离？</a></li>
+        <li><a href="#四种隔离级别">四种隔离级别</a></li>
+        <li><a href="#问题1脏读dirty-read">问题1：脏读（Dirty Read）</a></li>
+        <li><a href="#问题2不可重复读non-repeatable-read">问题2：不可重复读（Non-Repeatable Read）</a></li>
+        <li><a href="#问题3幻读phantom-read">问题3：幻读（Phantom Read）</a></li>
+        <li><a href="#隔离级别的选择">隔离级别的选择</a></li>
+        <li><a href="#实际案例库存扣减的并发问题">实际案例：库存扣减的并发问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#第五章d---持久性durability">第五章：D - 持久性（Durability）</a>
+      <ul>
+        <li><a href="#定义提交后永久保存">定义：提交后永久保存</a></li>
+        <li><a href="#持久性是如何实现的">持久性是如何实现的？</a></li>
+        <li><a href="#mysql的持久性保证">MySQL的持久性保证</a></li>
+      </ul>
+    </li>
+    <li><a href="#第六章实战指南">第六章：实战指南</a>
+      <ul>
+        <li><a href="#1-如何设置隔离级别">1. 如何设置隔离级别</a></li>
+        <li><a href="#2-如何选择隔离级别">2. 如何选择隔离级别？</a></li>
+        <li><a href="#3-常见陷阱">3. 常见陷阱</a></li>
+        <li><a href="#4-性能优化建议">4. 性能优化建议</a></li>
+      </ul>
+    </li>
+    <li><a href="#第七章监控与调试">第七章：监控与调试</a>
+      <ul>
+        <li><a href="#1-查看当前事务">1. 查看当前事务</a></li>
+        <li><a href="#2-日志分析">2. 日志分析</a></li>
+        <li><a href="#3-监控指标">3. 监控指标</a></li>
+      </ul>
+    </li>
+    <li><a href="#第八章acid-vs-base">第八章：ACID vs BASE</a>
+      <ul>
+        <li><a href="#为什么nosql用base">为什么NoSQL用BASE？</a></li>
+      </ul>
+    </li>
+    <li><a href="#尾声理解权衡">尾声：理解权衡</a></li>
+    <li><a href="#附录快速参考">附录：快速参考</a>
+      <ul>
+        <li><a href="#acid速查表">ACID速查表</a></li>
+        <li><a href="#隔离级别速查">隔离级别速查</a></li>
+        <li><a href="#最佳实践">最佳实践</a></li>
+      </ul>
+    </li>
+    <li><a href="#推荐资源">推荐资源</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="开场那笔消失的转账">开场：那笔消失的转账</h2>
+<p>2015年，某互联网公司的数据库出了个灵异事件。</p>
+<p>用户A转账1000元给用户B。但是：</p>
+<ul>
+<li>用户A的账户扣了1000元 ✅</li>
+<li>用户B的账户没有收到 ❌</li>
+</ul>
+<p>1000元凭空消失了。</p>
+<p>技术团队紧急排查，发现问题出在一个看似简单的转账操作：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 转账操作（错误示范）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">-</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;A&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 💥 这里服务器突然断电了
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">+</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;B&#39;</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>第一条SQL执行了，第二条没执行。钱就这么丢了。</p>
+<p>如果他们用了<strong>事务（Transaction）<strong>和</strong>ACID原则</strong>，这个问题根本不会发生。</p>
+<p>今天，我们就来聊聊ACID——关系数据库最核心的特性，它是如何保证你的数据安全的。</p>
+<hr>
+<h2 id="第一章什么是acid">第一章：什么是ACID？</h2>
+<p>ACID是四个英文单词的首字母缩写：</p>
+<ul>
+<li><strong>A</strong>tomicity（原子性）</li>
+<li><strong>C</strong>onsistency（一致性）</li>
+<li><strong>I</strong>solation（隔离性）</li>
+<li><strong>D</strong>urability（持久性）</li>
+</ul>
+<p>这四个特性共同保证了数据库事务的可靠性。</p>
+<h3 id="什么是事务">什么是事务？</h3>
+<p><strong>事务（Transaction）</strong> 是数据库的一组操作，要么全部成功，要么全部失败。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;  <span style="color:#75715e">-- 开始事务
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">-</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;A&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">+</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;B&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;  <span style="color:#75715e">-- 提交事务（全部生效）
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 或
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ROLLBACK</span>;  <span style="color:#75715e">-- 回滚事务（全部撤销）
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>事务就像一个<strong>原子操作的容器</strong>，保证一组操作的完整性。</p>
+<hr>
+<h2 id="第二章a---原子性atomicity">第二章：A - 原子性（Atomicity）</h2>
+<h3 id="定义要么全做要么全不做">定义：要么全做，要么全不做</h3>
+<p>原子性意味着事务中的所有写操作要么全部执行，要么全部不执行，不能只执行一部分。如果执行过程中出现故障，事务中的所有写操作都会被回滚。</p>
+<pre tabindex="0"><code>┌─────────────────────────────────────┐
+│  Transaction（事务）                 │
+│                                     │
+│  ① UPDATE accounts SET balance...   │
+│  ② UPDATE accounts SET balance...   │
+│  ③ INSERT INTO logs ...             │
+│                                     │
+│  要么全部成功 ✅                     │
+│  要么全部失败 ❌（自动回滚）         │
+└─────────────────────────────────────┘
+</code></pre><h3 id="实际例子银行转账">实际例子：银行转账</h3>
+<p><strong>正确的转账操作：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 扣款
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">-</span> <span style="color:#ae81ff">1000</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span> <span style="color:#66d9ef">AND</span> balance <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1000</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 检查扣款是否成功
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">IF</span> (affected_rows <span style="color:#f92672">!=</span> <span style="color:#ae81ff">1</span>) <span style="color:#66d9ef">THEN</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ROLLBACK</span>;  <span style="color:#75715e">-- 余额不足，回滚
+</span></span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">RETURN</span> <span style="color:#e6db74">&#39;Insufficient funds&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">END</span> <span style="color:#66d9ef">IF</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 入账
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">+</span> <span style="color:#ae81ff">1000</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Bob&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 记录日志
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> transfer_logs (from_user, to_user, amount, <span style="color:#66d9ef">timestamp</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">VALUES</span> (<span style="color:#e6db74">&#39;Alice&#39;</span>, <span style="color:#e6db74">&#39;Bob&#39;</span>, <span style="color:#ae81ff">1000</span>, NOW());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;  <span style="color:#75715e">-- 全部成功，提交
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>如果中途失败会怎样？</strong></p>
+<pre tabindex="0"><code>场景1: 服务器断电（在扣款后、入账前）
+→ 数据库重启后自动回滚未提交的事务
+→ Alice的余额恢复原状
+→ 钱没有丢失 ✅
+
+场景2: 程序异常（在入账后、记录日志前）
+→ ROLLBACK被调用
+→ 扣款和入账都被撤销
+→ 系统回到初始状态 ✅
+</code></pre><h3 id="原子性是如何实现的">原子性是如何实现的？</h3>
+<p>数据库用**预写日志（Write-Ahead Logging, WAL）**实现原子性：</p>
+<pre tabindex="0"><code>1. 事务开始前，数据库在日志中记录&#34;事务开始&#34;
+2. 每次修改前，先写入日志：&#34;准备修改X&#34;
+3. 修改数据
+4. 如果成功，写入日志：&#34;事务提交&#34;
+5. 如果失败，根据日志回滚所有修改
+</code></pre><p><strong>Undo Log（撤销日志）：</strong></p>
+<pre tabindex="0"><code>Transaction 101 开始
+  - 修改前：accounts(Alice).balance = 5000
+  - 修改后：accounts(Alice).balance = 4000
+  - 修改前：accounts(Bob).balance = 3000
+  - 修改后：accounts(Bob).balance = 4000
+Transaction 101 提交
+</code></pre><p>如果事务失败，数据库读取Undo Log，反向执行所有操作。</p>
+<hr>
+<h2 id="第三章c---一致性consistency">第三章：C - 一致性（Consistency）</h2>
+<h3 id="定义保持数据库的完整性约束">定义：保持数据库的完整性约束</h3>
+<p>一致性意味着保持数据库的不变性。事务写入的任何数据都必须符合所有定义的规则，并保持数据库处于良好状态。</p>
+<p><strong>一致性确保：</strong></p>
+<ul>
+<li>所有约束都被满足</li>
+<li>数据符合业务规则</li>
+<li>数据库从一个有效状态转换到另一个有效状态</li>
+</ul>
+<h3 id="例子1账户总额不变">例子1：账户总额不变</h3>
+<p><strong>业务规则：</strong> 转账前后，所有账户总额应该相同。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 转账前
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">SUM</span>(balance) <span style="color:#66d9ef">FROM</span> accounts;  <span style="color:#75715e">-- 结果：10000
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">-</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">+</span> <span style="color:#ae81ff">1000</span> <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Bob&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 转账后
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">SUM</span>(balance) <span style="color:#66d9ef">FROM</span> accounts;  <span style="color:#75715e">-- 结果：10000（不变）✅
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="例子2数据库约束">例子2：数据库约束</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> accounts (
+</span></span><span style="display:flex;"><span>    user_id VARCHAR(<span style="color:#ae81ff">50</span>) <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span>,
+</span></span><span style="display:flex;"><span>    balance DECIMAL(<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">2</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">CONSTRAINT</span> check_balance <span style="color:#66d9ef">CHECK</span> (balance <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>)  <span style="color:#75715e">-- 余额不能为负
+</span></span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 尝试非法操作
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> balance <span style="color:#f92672">-</span> <span style="color:#ae81ff">5000</span> <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- ❌ 错误：CHECK constraint violated: balance &gt;= 0
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 事务自动回滚
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="例子3外键约束">例子3：外键约束</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> orders (
+</span></span><span style="display:flex;"><span>    order_id INT <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span>,
+</span></span><span style="display:flex;"><span>    user_id VARCHAR(<span style="color:#ae81ff">50</span>),
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">FOREIGN</span> <span style="color:#66d9ef">KEY</span> (user_id) <span style="color:#66d9ef">REFERENCES</span> users(user_id)
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 尝试创建订单给不存在的用户
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> orders (order_id, user_id) <span style="color:#66d9ef">VALUES</span> (<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#39;NonExistentUser&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- ❌ 错误：Foreign key constraint violated
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="一致性的层次">一致性的层次</h3>
+<p><strong>1. 数据库层面：</strong></p>
+<ul>
+<li>主键约束</li>
+<li>外键约束</li>
+<li>唯一性约束</li>
+<li>CHECK约束</li>
+</ul>
+<p><strong>2. 应用层面：</strong></p>
+<ul>
+<li>业务逻辑规则</li>
+<li>数据验证</li>
+<li>状态机约束</li>
+</ul>
+<p><strong>重要提醒：</strong> 数据库只能保证数据库层面的一致性。应用层面的业务规则需要开发者自己保证。</p>
+<hr>
+<h2 id="第四章i---隔离性isolation">第四章：I - 隔离性（Isolation）</h2>
+<h3 id="定义并发事务互不干扰">定义：并发事务互不干扰</h3>
+<p>当有来自两个不同事务的并发写入时，这两个事务是相互隔离的。最严格的隔离是&quot;可串行化&quot;，即每个事务的行为就像它是数据库中唯一运行的事务一样。</p>
+<p>隔离性是ACID中<strong>最复杂</strong>的部分，因为它涉及到并发控制。</p>
+<h3 id="为什么需要隔离">为什么需要隔离？</h3>
+<p>想象这个场景：</p>
+<pre tabindex="0"><code>时间线：
+T1: Alice查余额：5000元
+T2: Bob也查余额：5000元
+T1: Alice转出1000元 → 余额变成4000元
+T2: Bob也转出1000元 → 余额变成4000元？
+
+结果：Alice和Bob都以为自己转账成功了，但实际上余额只扣了一次！
+</code></pre><p>这就是<strong>并发问题</strong>。隔离性就是为了解决这类问题。</p>
+<h3 id="四种隔离级别">四种隔离级别</h3>
+<p>SQL标准定义了四种隔离级别，从弱到强：</p>
+<pre tabindex="0"><code>┌─────────────────────┬──────────┬──────────┬──────────┐
+│   隔离级别          │脏读      │不可重复读│幻读      │
+├─────────────────────┼──────────┼──────────┼──────────┤
+│ READ UNCOMMITTED    │ 可能 ❌  │ 可能 ❌  │ 可能 ❌  │
+│ READ COMMITTED      │ 不可能✅ │ 可能 ❌  │ 可能 ❌  │
+│ REPEATABLE READ     │ 不可能✅ │ 不可能✅ │ 可能 ❌  │
+│ SERIALIZABLE        │ 不可能✅ │ 不可能✅ │ 不可能✅ │
+└─────────────────────┴──────────┴──────────┴──────────┘
+</code></pre><p>让我们逐个理解这些问题。</p>
+<h3 id="问题1脏读dirty-read">问题1：脏读（Dirty Read）</h3>
+<p><strong>定义：</strong> 读到了其他事务未提交的数据。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 时间线
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- T1: 事务1                    -- T2: 事务2
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> accounts 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> <span style="color:#ae81ff">10000</span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span>;
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">SELECT</span> balance 
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">FROM</span> accounts 
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span>;
+</span></span><span style="display:flex;"><span>                                <span style="color:#75715e">-- 读到：10000（脏数据）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">ROLLBACK</span>;  <span style="color:#75715e">-- 回滚了！
+</span></span></span><span style="display:flex;"><span>                                <span style="color:#75715e">-- 但事务2已经用了10000这个数据做决策
+</span></span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">COMMIT</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>危害：</strong> 事务2基于一个&quot;从未存在过&quot;的数据做了决策。</p>
+<p><strong>防止方法：</strong> 使用READ COMMITTED或更高级别。</p>
+<h3 id="问题2不可重复读non-repeatable-read">问题2：不可重复读（Non-Repeatable Read）</h3>
+<p><strong>定义：</strong> 同一个事务内，两次读取同一数据，结果不一样。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- T1: 事务1                    -- T2: 事务2
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> balance 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> accounts 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 读到：5000
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">UPDATE</span> accounts 
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">SET</span> balance <span style="color:#f92672">=</span> <span style="color:#ae81ff">4000</span> 
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span>;
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">COMMIT</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> balance 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> accounts 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> user_id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Alice&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 读到：4000（和第一次不一样！）
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>危害：</strong> 同一个事务内，数据不一致，可能导致逻辑错误。</p>
+<p><strong>防止方法：</strong> 使用REPEATABLE READ或更高级别。</p>
+<h3 id="问题3幻读phantom-read">问题3：幻读（Phantom Read）</h3>
+<p><strong>定义：</strong> 同一个事务内，两次查询，结果集的行数不一样。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- T1: 事务1                    -- T2: 事务2
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> accounts 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> balance <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1000</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 结果：5行
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> accounts 
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">VALUES</span> (<span style="color:#e6db74">&#39;Charlie&#39;</span>, <span style="color:#ae81ff">5000</span>);
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">COMMIT</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">COUNT</span>(<span style="color:#f92672">*</span>) 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> accounts 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> balance <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1000</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 结果：6行（多了一行&#34;幽灵&#34;）
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">COMMIT</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>危害：</strong> 统计、报表可能不准确。</p>
+<p><strong>防止方法：</strong> 使用SERIALIZABLE级别。</p>
+<h3 id="隔离级别的选择">隔离级别的选择</h3>
+<p><strong>READ UNCOMMITTED（读未提交）</strong></p>
+<ul>
+<li><strong>特点：</strong> 最低隔离级别，性能最好</li>
+<li><strong>问题：</strong> 脏读、不可重复读、幻读都可能发生</li>
+<li><strong>使用场景：</strong> 几乎不用，数据一致性无法保证</li>
+</ul>
+<p><strong>READ COMMITTED（读已提交）</strong></p>
+<ul>
+<li><strong>特点：</strong> 只能读到已提交的数据</li>
+<li><strong>问题：</strong> 不可重复读、幻读可能发生</li>
+<li><strong>使用场景：</strong>
+<ul>
+<li>大部分业务的默认选择</li>
+<li>电商显示库存（可以容忍临时不一致）</li>
+<li>实时监控面板</li>
+</ul>
+</li>
+<li><strong>数据库默认：</strong> Oracle, PostgreSQL</li>
+</ul>
+<p><strong>REPEATABLE READ（可重复读）</strong></p>
+<ul>
+<li><strong>特点：</strong> 事务内多次读取结果一致</li>
+<li><strong>问题：</strong> 幻读可能发生（MySQL InnoDB通过间隙锁避免了幻读）</li>
+<li><strong>使用场景：</strong>
+<ul>
+<li>需要数据一致性的业务</li>
+<li>报表生成</li>
+<li>数据分析</li>
+</ul>
+</li>
+<li><strong>数据库默认：</strong> MySQL InnoDB</li>
+</ul>
+<p><strong>SERIALIZABLE（可串行化）</strong></p>
+<ul>
+<li><strong>特点：</strong> 最高隔离级别，完全隔离</li>
+<li><strong>问题：</strong> 性能最差，并发度最低</li>
+<li><strong>使用场景：</strong>
+<ul>
+<li>金融交易（绝对不能出错）</li>
+<li>关键业务操作</li>
+<li>数据一致性要求极高的场景</li>
+</ul>
+</li>
+</ul>
+<h3 id="实际案例库存扣减的并发问题">实际案例：库存扣减的并发问题</h3>
+<p><strong>问题代码：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">purchase_item</span>(user_id, item_id, quantity):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 查询库存</span>
+</span></span><span style="display:flex;"><span>    stock <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>query(<span style="color:#e6db74">&#34;SELECT stock FROM items WHERE item_id = ?&#34;</span>, item_id)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> stock <span style="color:#f92672">&gt;=</span> quantity:
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 扣减库存</span>
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE items SET stock = stock - ? WHERE item_id = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>                   quantity, item_id)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 创建订单</span>
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT INTO orders (user_id, item_id, quantity) VALUES (?, ?, ?)&#34;</span>,
+</span></span><span style="display:flex;"><span>                   user_id, item_id, quantity)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Success&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Out of stock&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>并发场景：</strong></p>
+<pre tabindex="0"><code>初始库存：10件
+T1: 用户A购买9件 → 查到库存10 → 通过
+T2: 用户B购买9件 → 查到库存10 → 通过
+T1: 扣减库存 → 库存变成1
+T2: 扣减库存 → 库存变成-8（超卖了！）
+</code></pre><p><strong>正确做法1：使用事务 + 行锁</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">purchase_item</span>(user_id, item_id, quantity):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># FOR UPDATE 加行锁</span>
+</span></span><span style="display:flex;"><span>        stock <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>query(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;SELECT stock FROM items WHERE item_id = ? FOR UPDATE&#34;</span>, 
+</span></span><span style="display:flex;"><span>            item_id
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> stock <span style="color:#f92672">&gt;=</span> quantity:
+</span></span><span style="display:flex;"><span>            db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE items SET stock = stock - ? WHERE item_id = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>                       quantity, item_id)
+</span></span><span style="display:flex;"><span>            db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT INTO orders (user_id, item_id, quantity) VALUES (?, ?, ?)&#34;</span>,
+</span></span><span style="display:flex;"><span>                       user_id, item_id, quantity)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Success&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Out of stock&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>正确做法2：乐观锁（版本号）</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">purchase_item</span>(user_id, item_id, quantity):
+</span></span><span style="display:flex;"><span>    max_retries <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> attempt <span style="color:#f92672">in</span> range(max_retries):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 查询库存和版本号</span>
+</span></span><span style="display:flex;"><span>        item <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>query(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;SELECT stock, version FROM items WHERE item_id = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>            item_id
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> item<span style="color:#f92672">.</span>stock <span style="color:#f92672">&gt;=</span> quantity:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 使用版本号做乐观锁</span>
+</span></span><span style="display:flex;"><span>            affected <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>execute(
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;UPDATE items SET stock = stock - ?, version = version + 1 &#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;WHERE item_id = ? AND version = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>                quantity, item_id, item<span style="color:#f92672">.</span>version
+</span></span><span style="display:flex;"><span>            )
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> affected <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 成功更新，创建订单</span>
+</span></span><span style="display:flex;"><span>                db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT INTO orders ...&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Success&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 版本号不匹配，重试</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Out of stock&#34;</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Too many retries&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="第五章d---持久性durability">第五章：D - 持久性（Durability）</h2>
+<h3 id="定义提交后永久保存">定义：提交后永久保存</h3>
+<p>持久性保证事务提交后，即使系统发生故障，数据也会被持久化。在分布式系统中，这意味着数据被复制到其他节点。</p>
+<pre tabindex="0"><code>用户转账1000元
+    ↓
+事务COMMIT成功
+    ↓
+💥 服务器突然断电
+    ↓
+服务器重启
+    ↓
+数据依然存在 ✅（持久性保证）
+</code></pre><h3 id="持久性是如何实现的">持久性是如何实现的？</h3>
+<p><strong>1. Write-Ahead Logging (WAL)</strong></p>
+<pre tabindex="0"><code>写数据前，先写日志：
+
+1. 用户提交事务
+2. 数据库先写Redo Log（重做日志）到磁盘
+3. 日志写入成功后，返回&#34;提交成功&#34;
+4. 后台慢慢地将数据写入数据文件
+</code></pre><p><strong>为什么这样做？</strong></p>
+<ul>
+<li>日志是<strong>顺序写</strong>，速度快</li>
+<li>数据文件是<strong>随机写</strong>，速度慢</li>
+<li>即使断电，可以用日志恢复数据</li>
+</ul>
+<p><strong>2. 数据复制</strong></p>
+<p>在分布式系统中：</p>
+<pre tabindex="0"><code>主数据库（Primary）
+    ↓ 复制
+从数据库1（Replica 1）
+    ↓ 复制
+从数据库2（Replica 2）
+</code></pre><p>数据被复制到多个节点，一个节点挂了，其他节点还有数据。</p>
+<h3 id="mysql的持久性保证">MySQL的持久性保证</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 查看持久性配置
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> VARIABLES <span style="color:#66d9ef">LIKE</span> <span style="color:#e6db74">&#39;innodb_flush_log_at_trx_commit&#39;</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>配置选项：</strong></p>
+<ul>
+<li><strong>0</strong>：每秒刷新一次日志（性能最好，但可能丢失1秒数据）</li>
+<li><strong>1</strong>：每次提交都刷新（最安全，但性能较差）⭐ 推荐</li>
+<li><strong>2</strong>：每次提交写到OS缓存，每秒刷新到磁盘（折中方案）</li>
+</ul>
+<p><strong>生产环境建议：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">GLOBAL</span> innodb_flush_log_at_trx_commit <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;  <span style="color:#75715e">-- 保证持久性
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">GLOBAL</span> sync_binlog <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;  <span style="color:#75715e">-- 保证binlog持久性
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="第六章实战指南">第六章：实战指南</h2>
+<h3 id="1-如何设置隔离级别">1. 如何设置隔离级别</h3>
+<p><strong>MySQL：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 查看当前隔离级别
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">@@</span>transaction_isolation;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 设置会话级别
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">SESSION</span> <span style="color:#66d9ef">TRANSACTION</span> <span style="color:#66d9ef">ISOLATION</span> <span style="color:#66d9ef">LEVEL</span> <span style="color:#66d9ef">READ</span> <span style="color:#66d9ef">COMMITTED</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 设置全局级别（需要重启会话）
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">GLOBAL</span> transaction_isolation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;READ-COMMITTED&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 在配置文件中设置
+</span></span></span><span style="display:flex;"><span>[mysqld]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">transaction</span><span style="color:#f92672">-</span><span style="color:#66d9ef">isolation</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">READ</span><span style="color:#f92672">-</span><span style="color:#66d9ef">COMMITTED</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>PostgreSQL：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 查看当前隔离级别
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> transaction_isolation;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 设置当前事务
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">BEGIN</span> <span style="color:#66d9ef">TRANSACTION</span> <span style="color:#66d9ef">ISOLATION</span> <span style="color:#66d9ef">LEVEL</span> <span style="color:#66d9ef">SERIALIZABLE</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 设置会话级别
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">SESSION</span> <span style="color:#66d9ef">CHARACTERISTICS</span> <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">TRANSACTION</span> <span style="color:#66d9ef">ISOLATION</span> <span style="color:#66d9ef">LEVEL</span> <span style="color:#66d9ef">REPEATABLE</span> <span style="color:#66d9ef">READ</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-如何选择隔离级别">2. 如何选择隔离级别？</h3>
+<p><strong>决策树：</strong></p>
+<pre tabindex="0"><code>开始
+  ↓
+你的业务能容忍临时数据不一致吗？
+  ├─ Yes → READ COMMITTED（大部分场景）
+  │         例如：显示商品列表、用户评论
+  │
+  └─ No → 需要在事务内多次读取相同数据吗？
+            ├─ Yes → REPEATABLE READ
+            │         例如：生成报表、数据分析
+            │
+            └─ No → 是否是关键金融操作？
+                      ├─ Yes → SERIALIZABLE
+                      │         例如：转账、支付
+                      │
+                      └─ No → READ COMMITTED
+</code></pre><h3 id="3-常见陷阱">3. 常见陷阱</h3>
+<p><strong>陷阱1：忘记开启事务</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ❌ 错误：没有事务保护</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transfer</span>(from_user, to_user, amount):
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE accounts SET balance = balance - ? WHERE user = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>               amount, from_user)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 如果这里出错，钱就丢了</span>
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE accounts SET balance = balance + ? WHERE user = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>               amount, to_user)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✅ 正确：使用事务</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transfer</span>(from_user, to_user, amount):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE accounts SET balance = balance - ? WHERE user = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>                   amount, from_user)
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE accounts SET balance = balance + ? WHERE user = ?&#34;</span>, 
+</span></span><span style="display:flex;"><span>                   amount, to_user)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>陷阱2：长事务</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ❌ 错误：事务太长</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    orders <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>query(<span style="color:#e6db74">&#34;SELECT * FROM orders WHERE status = &#39;pending&#39;&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> order <span style="color:#f92672">in</span> orders:
+</span></span><span style="display:flex;"><span>        process_order(order)  <span style="color:#75715e"># 可能很慢</span>
+</span></span><span style="display:flex;"><span>        send_email(order)     <span style="color:#75715e"># 可能很慢</span>
+</span></span><span style="display:flex;"><span>        update_inventory(order)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 事务一直没提交，锁一直持有</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 提交</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✅ 正确：缩短事务</span>
+</span></span><span style="display:flex;"><span>orders <span style="color:#f92672">=</span> db<span style="color:#f92672">.</span>query(<span style="color:#e6db74">&#34;SELECT * FROM orders WHERE status = &#39;pending&#39;&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> order <span style="color:#f92672">in</span> orders:
+</span></span><span style="display:flex;"><span>    process_order(order)
+</span></span><span style="display:flex;"><span>    send_email(order)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 每个订单一个事务</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>        update_inventory(order)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>陷阱3：在事务中调用外部服务</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ❌ 错误：事务中调用外部API</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT INTO orders ...&#34;</span>)
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> call_payment_api(order)  <span style="color:#75715e"># 外部API很慢</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>success:
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE orders SET status = &#39;paid&#39; ...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✅ 正确：先调用外部API</span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> call_payment_api(order)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT INTO orders ...&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> result<span style="color:#f92672">.</span>success:
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;UPDATE orders SET status = &#39;paid&#39; ...&#34;</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>陷阱4：死锁</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- T1                          -- T2
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;              <span style="color:#66d9ef">START</span> <span style="color:#66d9ef">TRANSACTION</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> A <span style="color:#66d9ef">SET</span> ...;               <span style="color:#66d9ef">UPDATE</span> B <span style="color:#66d9ef">SET</span> ...;
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">UPDATE</span> A <span style="color:#66d9ef">SET</span> ...;  <span style="color:#75715e">-- 等待T1释放A的锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">UPDATE</span> B <span style="color:#66d9ef">SET</span> ...;               <span style="color:#75715e">-- 等待T2释放B的锁
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">-- 💀 死锁！
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>解决方案：</strong></p>
+<ol>
+<li>按相同顺序访问资源</li>
+<li>使用<code>NOWAIT</code>或<code>SKIP LOCKED</code></li>
+<li>设置死锁超时时间</li>
+<li>监控死锁，优化代码</li>
+</ol>
+<h3 id="4-性能优化建议">4. 性能优化建议</h3>
+<p><strong>优化1：使用合适的隔离级别</strong></p>
+<pre tabindex="0"><code>不要盲目使用SERIALIZABLE
+↓
+大部分场景用READ COMMITTED
+↓
+性能提升20-50%
+</code></pre><p><strong>优化2：减少事务范围</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Before: 慢</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> fetch_external_data()  <span style="color:#75715e"># 10秒</span>
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT ...&#34;</span>)       <span style="color:#75715e"># 0.01秒</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># After: 快</span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> fetch_external_data()  <span style="color:#75715e"># 在事务外</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT ...&#34;</span>)  <span style="color:#75715e"># 事务只持有0.01秒</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>优化3：使用批量操作</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Before: 慢（1000个事务）</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT INTO ...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># After: 快（1个事务）</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> items:
+</span></span><span style="display:flex;"><span>        db<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;INSERT INTO ...&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 或使用批量插入</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> db<span style="color:#f92672">.</span>transaction():
+</span></span><span style="display:flex;"><span>    db<span style="color:#f92672">.</span>execute_many(<span style="color:#e6db74">&#34;INSERT INTO ...&#34;</span>, items)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="第七章监控与调试">第七章：监控与调试</h2>
+<h3 id="1-查看当前事务">1. 查看当前事务</h3>
+<p><strong>MySQL：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 查看正在运行的事务
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> information_schema.innodb_trx;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看锁等待
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> performance_schema.data_locks;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看死锁历史
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SHOW</span> ENGINE INNODB STATUS;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>PostgreSQL：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 查看当前活动
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> pg_stat_activity <span style="color:#66d9ef">WHERE</span> <span style="color:#66d9ef">state</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;active&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看锁
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> pg_locks;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看等待
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> pg_stat_activity <span style="color:#66d9ef">WHERE</span> wait_event <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-日志分析">2. 日志分析</h3>
+<p><strong>慢查询日志：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- MySQL
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">GLOBAL</span> slow_query_log <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">SET</span> <span style="color:#66d9ef">GLOBAL</span> long_query_time <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;  <span style="color:#75715e">-- 超过1秒记录
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 查看慢查询
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">FROM</span> mysql.slow_log;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-监控指标">3. 监控指标</h3>
+<p><strong>关键指标：</strong></p>
+<ul>
+<li>事务吞吐量（TPS）</li>
+<li>事务响应时间（P95, P99）</li>
+<li>锁等待数量</li>
+<li>死锁发生次数</li>
+<li>事务回滚率</li>
+</ul>
+<hr>
+<h2 id="第八章acid-vs-base">第八章：ACID vs BASE</h2>
+<h3 id="为什么nosql用base">为什么NoSQL用BASE？</h3>
+<p>NoSQL数据库（如MongoDB, Cassandra）通常不遵循ACID，而是遵循BASE：</p>
+<ul>
+<li><strong>B</strong>asically <strong>A</strong>vailable（基本可用）</li>
+<li><strong>S</strong>oft state（软状态）</li>
+<li><strong>E</strong>ventually consistent（最终一致性）</li>
+</ul>
+<p><strong>为什么？</strong></p>
+<pre tabindex="0"><code>CAP定理：
+分布式系统只能同时满足以下三个中的两个：
+- Consistency（一致性）
+- Availability（可用性）
+- Partition tolerance（分区容错性）
+
+ACID数据库选择：CP（一致性 + 分区容错）
+BASE数据库选择：AP（可用性 + 分区容错）
+</code></pre><p><strong>什么时候用NoSQL/BASE？</strong></p>
+<ul>
+<li>社交媒体（点赞数可以延迟更新）</li>
+<li>日志系统（可以容忍丢失少量日志）</li>
+<li>缓存系统</li>
+</ul>
+<p><strong>什么时候必须用ACID？</strong></p>
+<ul>
+<li>金融交易</li>
+<li>订单系统</li>
+<li>库存管理</li>
+<li>任何涉及钱的系统</li>
+</ul>
+<hr>
+<h2 id="尾声理解权衡">尾声：理解权衡</h2>
+<p>回到开头的故事。那笔消失的1000元，最终是怎么找回来的？</p>
+<p>技术团队加班三天三夜，从备份、日志、监控中拼凑出了真相，手动修复了数据。然后：</p>
+<ol>
+<li>所有转账操作改用事务</li>
+<li>隔离级别设置为REPEATABLE READ</li>
+<li>增加了事务监控和告警</li>
+<li>写了一套自动化测试，覆盖各种并发场景</li>
+</ol>
+<p><strong>教训：</strong></p>
+<ul>
+<li>ACID不是理论，是生产环境的救命稻草</li>
+<li>不要自作聪明地&quot;优化&quot;掉事务</li>
+<li>了解你的数据库，了解你的隔离级别</li>
+<li>测试并发场景，不要等到生产环境出问题</li>
+</ul>
+<p><strong>记住：</strong></p>
+<blockquote>
+<p>数据库的ACID特性，是用50年的工程实践换来的。<br>
+不要轻易放弃它。</p>
+</blockquote>
+<hr>
+<h2 id="附录快速参考">附录：快速参考</h2>
+<h3 id="acid速查表">ACID速查表</h3>
+<pre tabindex="0"><code>┌──────────┬─────────────────────────────────────┐
+│ 原子性   │ 事务要么全做，要么全不做            │
+│(Atomicity)│ 实现：Undo Log                     │
+├──────────┼─────────────────────────────────────┤
+│ 一致性   │ 数据符合所有约束和业务规则          │
+│(Consistency)│ 实现：约束检查 + 应用逻辑        │
+├──────────┼─────────────────────────────────────┤
+│ 隔离性   │ 并发事务互不干扰                    │
+│(Isolation)│ 实现：锁 + MVCC                    │
+├──────────┼─────────────────────────────────────┤
+│ 持久性   │ 提交后永久保存                      │
+│(Durability)│ 实现：WAL + 复制                  │
+└──────────┴─────────────────────────────────────┘
+</code></pre><h3 id="隔离级别速查">隔离级别速查</h3>
+<pre tabindex="0"><code>┌──────────────────┬──────────────────────┐
+│ READ UNCOMMITTED │ 几乎不用（不安全）   │
+├──────────────────┼──────────────────────┤
+│ READ COMMITTED   │ 推荐（大部分场景）   │
+├──────────────────┼──────────────────────┤
+│ REPEATABLE READ  │ 报表、分析           │
+├──────────────────┼──────────────────────┤
+│ SERIALIZABLE     │ 金融、关键操作       │
+└──────────────────┴──────────────────────┘
+</code></pre><h3 id="最佳实践">最佳实践</h3>
+<ol>
+<li>✅ <strong>始终使用事务</strong>保护关键操作</li>
+<li>✅ <strong>选择合适的隔离级别</strong>（默认READ COMMITTED）</li>
+<li>✅ <strong>缩短事务时间</strong>（不要在事务中调用外部服务）</li>
+<li>✅ <strong>监控事务性能</strong>（TPS、锁等待、死锁）</li>
+<li>✅ <strong>测试并发场景</strong>（压力测试、混沌测试）</li>
+<li>❌ <strong>不要使用自动提交</strong>模式处理复杂操作</li>
+<li>❌ <strong>不要在循环中开启独立事务</strong>（使用批量操作）</li>
+<li>❌ <strong>不要忽略死锁</strong>（添加重试逻辑）</li>
+</ol>
+<hr>
+<h2 id="推荐资源">推荐资源</h2>
+<p><strong>书籍：</strong></p>
+<ul>
+<li>《设计数据密集型应用》（Designing Data-Intensive Applications）</li>
+<li>《数据库系统概念》（Database System Concepts）</li>
+<li>《高性能MySQL》</li>
+</ul>
+<p><strong>在线资源：</strong></p>
+<ul>
+<li>MySQL官方文档：Transaction Isolation Levels</li>
+<li>PostgreSQL官方文档：Transaction Isolation</li>
+<li>ByteByteGo：Database and Storage Guides</li>
+</ul>
+<p><strong>工具：</strong></p>
+<ul>
+<li>pt-deadlock-logger：死锁分析</li>
+<li>mysqltuner：性能分析</li>
+<li>pgAdmin：PostgreSQL管理</li>
+</ul>
+<hr>
+<p><em>下一篇，我们聊聊分布式事务：当数据分散在多个数据库时，如何保证ACID？</em></p>
+<p><em>如果你对某个主题感兴趣（如MVCC原理、分布式锁、Saga模式），欢迎留言。</em></p>
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/kaka-milan-22" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/kaka99859362" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+<a href="mailto:kaka@kakacn.com" target="_blank" rel="noopener noreferrer me"
+    title="Email">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2026 Kaka.
+        
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

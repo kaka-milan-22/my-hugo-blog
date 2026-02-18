@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>HTTPS on 我的技术博客</title>
+    <link>http://localhost:1313/tags/https/</link>
+    <description>Recent content in HTTPS on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sat, 14 Feb 2026 12:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/https/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>HTTPS的秘密：当互联网穿上了&#34;防弹衣&#34;</title>
+      <link>http://localhost:1313/posts/2026-02-14-https-tls-explained/</link>
+      <pubDate>Sat, 14 Feb 2026 12:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-14-https-tls-explained/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771046932355_tls.png&#34; alt=&#34;tls.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;序章那个不设防的时代&#34;&gt;序章：那个不设防的时代&lt;/h2&gt;
+&lt;p&gt;2010年的一个下午，我坐在星巴克里，连上了免费WiFi，打开网页准备查邮件。&lt;/p&gt;
+&lt;p&gt;旁边一个戴着帽子的年轻人拿出笔记本，打开了一个叫Wireshark的软件。几分钟后，他嘴角露出了笑容。&lt;/p&gt;
+&lt;p&gt;我不知道的是，我的用户名和密码，此刻正在他的屏幕上，明明白白地显示着：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;User: zhang.san@company.com
+Pass: 123456
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;这不是电影情节，这是2010年之前互联网的真实写照。那时候，大部分网站都在用HTTP——一个&lt;strong&gt;完全明文传输&lt;/strong&gt;的协议。&lt;/p&gt;
+&lt;p&gt;今天，当你看到浏览器地址栏里的小锁图标🔒时，可能不会想太多。但这个小锁背后，是一场持续了20多年的安全革命。&lt;/p&gt;
+&lt;p&gt;这就是HTTPS的故事。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

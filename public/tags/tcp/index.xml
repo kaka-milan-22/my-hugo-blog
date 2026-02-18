@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>TCP on 我的技术博客</title>
+    <link>http://localhost:1313/tags/tcp/</link>
+    <description>Recent content in TCP on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sat, 14 Feb 2026 12:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/tcp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>互联网是如何工作的：从网络边缘到核心协议的完整解析</title>
+      <link>http://localhost:1313/posts/2026-02-14-internet-architecture/</link>
+      <pubDate>Sat, 14 Feb 2026 12:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-14-internet-architecture/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771047011956_internet.png&#34; alt=&#34;internet.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;前言那个看不见的世界&#34;&gt;前言：那个看不见的世界&lt;/h2&gt;
+&lt;p&gt;你有没有想过，当你在浏览器里输入 &lt;code&gt;www.google.com&lt;/code&gt; 按下回车的那一刻，到页面显示出来的这几百毫秒里，背后发生了什么？&lt;/p&gt;
+&lt;p&gt;你的数据包经历了一场怎样的旅程？它穿过了哪些设备？遵循了哪些规则？为什么全球几十亿台设备能够互相通信而不会乱套？&lt;/p&gt;
+&lt;p&gt;今天，我想带你一层一层剥开互联网的&amp;quot;洋葱&amp;quot;，看看这个已经运行了50多年的系统，是如何精妙地组织起来的。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>HTTP协议的25年进化史：从简单到极致的性能之旅</title>
+      <link>http://localhost:1313/posts/2026-02-13-disk-grow/</link>
+      <pubDate>Fri, 13 Feb 2026 10:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-13-disk-grow/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;http://localhost:1313/images/http.jpg&#34; alt=&#34;http&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;写在前面&#34;&gt;写在前面&lt;/h2&gt;
+&lt;p&gt;你有没有想过，当你在手机上刷短视频、在地铁里看直播的时候，背后的网络协议经历了怎样的进化？今天我想和你聊聊HTTP协议这25年的故事——一个关于如何不断打破性能瓶颈、解决真实世界问题的技术演进之旅。&lt;/p&gt;
+&lt;p&gt;作为一个做了15年运维的人，我见证了从HTTP/1.1到HTTP/3的整个演变过程。这不是一场技术的炫技秀，而是工程师们面对真实痛点，一次次妥协、权衡、突破的过程。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

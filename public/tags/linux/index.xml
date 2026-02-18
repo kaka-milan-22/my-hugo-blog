@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on 我的技术博客</title>
+    <link>http://localhost:1313/tags/linux/</link>
+    <description>Recent content in Linux on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Mon, 16 Feb 2026 18:58:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux 文件系统层级标准 (FHS) 完全指南：运维人员快速定位问题的必备知识</title>
+      <link>http://localhost:1313/posts/2026-02-16-linux-filesystem-hierarchy-guide/</link>
+      <pubDate>Mon, 16 Feb 2026 18:58:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-linux-filesystem-hierarchy-guide/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;作为运维工程师，你是否曾经困惑过：为什么有些程序在 &lt;code&gt;/bin&lt;/code&gt;，有些在 &lt;code&gt;/usr/bin&lt;/code&gt;？日志文件应该去哪里找？系统配置文件又存放在哪里？&lt;/p&gt;
+&lt;p&gt;早期的 Linux 发行版各自为政，目录结构混乱不堪，给运维人员带来了巨大的困扰。为了解决这个问题，&lt;strong&gt;Linux 文件系统层级标准 (Filesystem Hierarchy Standard, FHS)&lt;/strong&gt; 应运而生。它定义了一套统一的目录结构规范，让所有的 Linux 发行版都遵循相同的组织方式。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
+      <title>深入理解 Linux 启动过程：从 BIOS 到用户登录</title>
+      <link>http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/</link>
+      <pubDate>Mon, 16 Feb 2026 14:29:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Linux 系统的启动过程是一个复杂而精密的过程，涉及固件、引导加载器、内核、init 系统等多个组件的协同工作。对于运维工程师来说，深入理解启动过程不仅有助于快速定位系统启动故障，还能优化启动性能、实现系统定制化配置。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

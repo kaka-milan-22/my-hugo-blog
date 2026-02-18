@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Distributed-Systems on 我的技术博客</title>
+    <link>http://localhost:1313/tags/distributed-systems/</link>
+    <description>Recent content in Distributed-Systems on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sun, 15 Feb 2026 10:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/distributed-systems/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>系统设计：为什么 Kafka 如此流行？</title>
+      <link>http://localhost:1313/posts/2026-02-15-kafka-system-design/</link>
+      <pubDate>Sun, 15 Feb 2026 10:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-15-kafka-system-design/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771165068791_kafka.jpg&#34; alt=&#34;kafka.jpg&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Apache Kafka 已经成为现代分布式系统中不可或缺的组件。LinkedIn、Netflix、Uber 等公司每天使用 Kafka 处理数十亿条消息。作为运维人员，深入理解 Kafka 的架构和工作原理对于系统的稳定运行至关重要。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

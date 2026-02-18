@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS） | 我的技术博客</title>
+<meta property="og:title" content="一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS） | 我的技术博客" />
+<meta name="twitter:title" content="一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS） | 我的技术博客" />
+<meta itemprop="name" content="一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS） | 我的技术博客" />
+<meta name="application-name" content="一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS） | 我的技术博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="kaka 的技术博客，记录运维、云原生、网络与系统架构">
+<meta itemprop="description" content="kaka 的技术博客，记录运维、云原生、网络与系统架构" />
+<meta property="og:description" content="kaka 的技术博客，记录运维、云原生、网络与系统架构" />
+<meta name="twitter:description" content="kaka 的技术博客，记录运维、云原生、网络与系统架构" />
+
+<meta property="og:locale" content="zh" />
+<meta name="language" content="zh" />
+
+  <link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-01-13-disk-grow/" title="中文" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-01-13T15:00:00&#43;0800 />
+    <meta property="article:published_time" content=2026-01-13T15:00:00&#43;0800 />
+    <meta property="og:url" content="http://localhost:1313/posts/2026-01-13-disk-grow/" />
+
+    
+    <meta property="og:article:author" content="Kaka" />
+    <meta property="article:author" content="Kaka" />
+    <meta name="author" content="Kaka" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "一次在线磁盘扩容的完整记录（EBS + growpart + XFS）",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-01-13",
+        "description": "",
+        "wordCount":  2192 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-01-13",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "我的技术博客"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.154.3">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/2026-01-13-disk-grow/">
+  <meta property="og:site_name" content="我的技术博客">
+  <meta property="og:title" content="一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS）">
+  <meta property="og:description" content="前言 昨天遇到了一个典型的生产环境问题：根盘空间不足。作为一个有多年运维经验的老司机，这种情况见得不少，但每次处理都要格外小心。今天记录一下整个处理过程，希望能给遇到同样问题的朋友们一些参考。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-01-13T15:00:00+08:00">
+    <meta property="article:modified_time" content="2026-01-13T15:00:00+08:00">
+    <meta property="article:tag" content="AWS">
+    <meta property="article:tag" content="EBS">
+    <meta property="article:tag" content="磁盘扩容">
+    <meta property="article:tag" content="XFS">
+    <meta property="article:tag" content="Linux运维">
+    <meta property="article:tag" content="云存储">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS）">
+  <meta name="twitter:description" content="前言 昨天遇到了一个典型的生产环境问题：根盘空间不足。作为一个有多年运维经验的老司机，这种情况见得不少，但每次处理都要格外小心。今天记录一下整个处理过程，希望能给遇到同样问题的朋友们一些参考。">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/2026-01-13-disk-grow/">
+    <link href="/style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title></title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        首页
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/posts/">
+                        文章
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/tags/">
+                        标签
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">一次在线磁盘扩容的完整记录（EBS &#43; growpart &#43; XFS）</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-01-13T15:00:00&#43;08:00" itemprop="datePublished"> 2026年1月13日 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b></b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#-问题背景">� 问题背景</a></li>
+    <li><a href="#-磁盘扩容的本质重要概念">💡 磁盘扩容的本质（重要概念）</a></li>
+    <li><a href="#-各层支持情况一览">📋 各层支持情况一览</a>
+      <ul>
+        <li><a href="#云存储层支持矩阵">云存储层支持矩阵</a></li>
+        <li><a href="#os分区层支持情况">OS分区层支持情况</a></li>
+        <li><a href="#文件系统支持矩阵">文件系统支持矩阵</a></li>
+      </ul>
+    </li>
+    <li><a href="#-扩容前的状态确认">🔍 扩容前的状态确认</a></li>
+    <li><a href="#-实际操作过程">🛠 实际操作过程</a>
+      <ul>
+        <li><a href="#第一步安装扩容工具">第一步：安装扩容工具</a></li>
+        <li><a href="#第二步扩展分区边界">第二步：扩展分区边界</a></li>
+        <li><a href="#第三步扩展xfs文件系统">第三步：扩展XFS文件系统</a></li>
+      </ul>
+    </li>
+    <li><a href="#-验证扩容结果">✅ 验证扩容结果</a></li>
+    <li><a href="#-安全性分析">🛡 安全性分析</a>
+      <ul>
+        <li><a href="#-安全前提条件">✅ 安全前提条件</a></li>
+        <li><a href="#-操作原理说明">🔧 操作原理说明</a></li>
+        <li><a href="#-注意事项">⚠️ 注意事项</a></li>
+      </ul>
+    </li>
+    <li><a href="#-其他文件系统的操作方法">📚 其他文件系统的操作方法</a>
+      <ul>
+        <li><a href="#lvm环境的扩容步骤">LVM环境的扩容步骤</a></li>
+      </ul>
+    </li>
+    <li><a href="#-实战总结">🎯 实战总结</a>
+      <ul>
+        <li><a href="#核心要点">核心要点</a></li>
+        <li><a href="#经验教训">经验教训</a></li>
+        <li><a href="#一句话总结">一句话总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#-写在最后">📞 写在最后</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="前言">前言</h2>
+<p>昨天遇到了一个典型的生产环境问题：根盘空间不足。作为一个有多年运维经验的老司机，这种情况见得不少，但每次处理都要格外小心。今天记录一下整个处理过程，希望能给遇到同样问题的朋友们一些参考。</p>
+<h2 id="-问题背景">� 问题背景</h2>
+<p>这次的情况是生产环境的一台关键服务器，根盘从180G需要扩容到280G。AWS控制台那边已经完成了EBS卷的扩容操作，但操作系统层面还没有识别到新增的空间，这是很常见的情况。</p>
+<p><strong>关键信息</strong>：</p>
+<ul>
+<li>系统：CentOS 7</li>
+<li>磁盘：AWS EBS gp3</li>
+<li>文件系统：XFS</li>
+<li>目标：180G → 280G（在线扩容）</li>
+</ul>
+<hr>
+<h2 id="-磁盘扩容的本质重要概念">💡 磁盘扩容的本质（重要概念）</h2>
+<p>很多同学对磁盘扩容的理解有偏差，以为在云控制台点个按钮就完事了。实际上，<strong>磁盘扩容涉及三个独立的层次</strong>，每个层次都需要单独处理：</p>
+<pre tabindex="0"><code>云平台层 ➔ 操作系统层 ➔ 文件系统层
+</code></pre><table>
+  <thead>
+      <tr>
+          <th>层次</th>
+          <th>负责的事情</th>
+          <th>是否自动同步</th>
+          <th>常用工具</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>云平台层</strong></td>
+          <td>虚拟磁盘大小</td>
+          <td>❌ 否</td>
+          <td>AWS Console、云API</td>
+      </tr>
+      <tr>
+          <td><strong>操作系统层</strong></td>
+          <td>分区表边界</td>
+          <td>❌ 否</td>
+          <td><code>growpart</code>、<code>parted</code></td>
+      </tr>
+      <tr>
+          <td><strong>文件系统层</strong></td>
+          <td>空间分配管理</td>
+          <td>❌ 否</td>
+          <td><code>xfs_growfs</code>、<code>resize2fs</code></td>
+      </tr>
+  </tbody>
+</table>
+<p>这就是为什么云控制台扩容后，系统里看到的可用空间没有变化的原因。</p>
+<hr>
+<h2 id="-各层支持情况一览">📋 各层支持情况一览</h2>
+<p>在开始操作前，我习惯性地梳理一下各个层次的支持情况，避免踩坑。</p>
+<h3 id="云存储层支持矩阵">云存储层支持矩阵</h3>
+<table>
+  <thead>
+      <tr>
+          <th>存储类型</th>
+          <th>在线扩容支持</th>
+          <th>备注说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>AWS EBS</td>
+          <td>✅ 支持</td>
+          <td>虚拟块设备，扩容很灵活</td>
+      </tr>
+      <tr>
+          <td>Google Cloud PD</td>
+          <td>✅ 支持</td>
+          <td>机制类似EBS</td>
+      </tr>
+      <tr>
+          <td>Azure Managed Disks</td>
+          <td>✅ 支持</td>
+          <td>同样是虚拟化存储</td>
+      </tr>
+      <tr>
+          <td>OpenStack Cinder</td>
+          <td>⚠️ 取决于后端</td>
+          <td>Ceph后端通常支持</td>
+      </tr>
+      <tr>
+          <td>物理硬盘</td>
+          <td>❌ 不支持</td>
+          <td>物理容量固定</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="os分区层支持情况">OS分区层支持情况</h3>
+<table>
+  <thead>
+      <tr>
+          <th>使用场景</th>
+          <th>在线扩容</th>
+          <th>风险等级</th>
+          <th>注意事项</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>末尾分区向后扩展</td>
+          <td>✅ 支持</td>
+          <td>🟢 低风险</td>
+          <td>推荐操作</td>
+      </tr>
+      <tr>
+          <td>中间分区移动/调整</td>
+          <td>❌ 不支持</td>
+          <td>🔴 高风险</td>
+          <td>需要离线操作</td>
+      </tr>
+      <tr>
+          <td>GPT分区表</td>
+          <td>✅ 推荐</td>
+          <td>🟢 无限制</td>
+          <td>现代系统默认</td>
+      </tr>
+      <tr>
+          <td>MBR分区表</td>
+          <td>⚠️ 有限制</td>
+          <td>🟡 中等</td>
+          <td>最大2TB限制</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>重点说明</strong>：<code>growpart</code>工具只修改分区表的边界信息，不会移动任何数据，所以风险很低。</p>
+<h3 id="文件系统支持矩阵">文件系统支持矩阵</h3>
+<table>
+  <thead>
+      <tr>
+          <th>文件系统类型</th>
+          <th>在线扩容</th>
+          <th>在线缩容</th>
+          <th>我的使用建议</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>XFS</strong></td>
+          <td>✅ 支持</td>
+          <td>❌ 不支持</td>
+          <td>生产环境首选</td>
+      </tr>
+      <tr>
+          <td><strong>ext4</strong></td>
+          <td>✅ 支持</td>
+          <td>❌ 不支持</td>
+          <td>传统选择，稳定</td>
+      </tr>
+      <tr>
+          <td><strong>Btrfs</strong></td>
+          <td>✅ 支持</td>
+          <td>✅ 支持</td>
+          <td>功能强大，但相对较新</td>
+      </tr>
+      <tr>
+          <td><strong>ZFS</strong></td>
+          <td>✅ 支持（pool级别）</td>
+          <td>✅ 支持</td>
+          <td>企业级选择</td>
+      </tr>
+      <tr>
+          <td><strong>NTFS</strong></td>
+          <td>⚠️ 部分支持</td>
+          <td>❌ 不支持</td>
+          <td>Windows专用</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="-扩容前的状态确认">🔍 扩容前的状态确认</h2>
+<p>在动手之前，我习惯先全面了解当前的状态，这是个好习惯。</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看当前磁盘和分区状态</span>
+</span></span><span style="display:flex;"><span>lsblk -l
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>输出结果</strong>：</p>
+<pre tabindex="0"><code>NAME        SIZE TYPE MOUNTPOINTS
+nvme0n1     280G disk                    # 云平台已扩容到280G
+nvme0n1p1   180G part /                  # 根分区还是180G
+nvme0n1p128 10M  part /boot/efi          # EFI分区
+</code></pre><p><strong>状态分析</strong>：</p>
+<ul>
+<li>✅ 底层磁盘已经识别为280G</li>
+<li>❌ 根分区仍然是180G</li>
+<li>💡 磁盘尾部有100G未分配空间等待使用</li>
+</ul>
+<hr>
+<h2 id="-实际操作过程">🛠 实际操作过程</h2>
+<h3 id="第一步安装扩容工具">第一步：安装扩容工具</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># CentOS/RHEL系统</span>
+</span></span><span style="display:flex;"><span>sudo yum install -y cloud-utils-growpart
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ubuntu/Debian系统  </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># sudo apt-get install -y cloud-guest-utils</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="第二步扩展分区边界">第二步：扩展分区边界</h3>
+<p>这一步是关键，要把分区表中的分区边界扩展到磁盘末尾：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 扩展第1个分区（根分区）</span>
+</span></span><span style="display:flex;"><span>sudo growpart /dev/nvme0n1 <span style="color:#ae81ff">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>预期输出</strong>：</p>
+<pre tabindex="0"><code>CHANGED: partition=1 start=2048 old: size=377485287 end=377487335 new: size=587200511 end=587202559
+</code></pre><p><strong>确认分区已扩展</strong>：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>lsblk -l
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>新的输出</strong>：</p>
+<pre tabindex="0"><code>NAME        SIZE TYPE MOUNTPOINTS
+nvme0n1     280G disk
+nvme0n1p1   280G part /                  # ✅ 分区已扩展到280G
+nvme0n1p128 10M  part /boot/efi
+</code></pre><h3 id="第三步扩展xfs文件系统">第三步：扩展XFS文件系统</h3>
+<p>分区边界扩大了，但文件系统还需要重新扫描并认领新空间：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 扩展挂载在根目录的XFS文件系统</span>
+</span></span><span style="display:flex;"><span>sudo xfs_growfs /
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 或者直接指定设备名</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># sudo xfs_growfs /dev/nvme0n1p1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>预期输出</strong>：</p>
+<pre tabindex="0"><code>meta-data=/dev/nvme0n1p1         isize=512    agcount=24, agsize=3932160 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+data     =                       bsize=4096   blocks=94371840, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal               bsize=4096   blocks=46080, version=2
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+data blocks changed from 47168286 to 73400063
+</code></pre><hr>
+<h2 id="-验证扩容结果">✅ 验证扩容结果</h2>
+<p>最后确认一下扩容是否成功：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>df -hT /
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>输出结果</strong>：</p>
+<pre tabindex="0"><code>Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/nvme0n1p1 xfs   280G   98G  183G  35% /
+</code></pre><p>🎉 <strong>完美！</strong> 从180G成功扩容到280G，可用空间从几十G增加到183G。</p>
+<hr>
+<h2 id="-安全性分析">🛡 安全性分析</h2>
+<p>这次操作为什么风险很低？主要基于以下几个前提条件：</p>
+<h3 id="-安全前提条件">✅ 安全前提条件</h3>
+<ol>
+<li><strong>根分区位于磁盘末尾</strong>：可以直接向后扩展</li>
+<li><strong>XFS文件系统支持在线扩容</strong>：无需卸载文件系统</li>
+<li><strong>只是扩展，不涉及数据移动</strong>：不会碰触现有数据</li>
+</ol>
+<h3 id="-操作原理说明">🔧 操作原理说明</h3>
+<ul>
+<li><code>growpart</code>：仅修改分区表中的边界信息</li>
+<li><code>xfs_growfs</code>：更新文件系统的元数据信息</li>
+<li><strong>整个过程无数据移动</strong>：所以风险极低</li>
+</ul>
+<h3 id="-注意事项">⚠️ 注意事项</h3>
+<ul>
+<li>操作前务必确认有<strong>完整的数据备份</strong></li>
+<li>在业务低峰期操作</li>
+<li>准备好回滚方案（虽然基本用不上）</li>
+</ul>
+<hr>
+<h2 id="-其他文件系统的操作方法">📚 其他文件系统的操作方法</h2>
+<p>不同文件系统的扩容命令略有差异，这里整理一下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>文件系统</th>
+          <th>扩容命令</th>
+          <th>适用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>XFS</strong></td>
+          <td><code>xfs_growfs /path</code></td>
+          <td>现代Linux发行版推荐</td>
+      </tr>
+      <tr>
+          <td><strong>ext4</strong></td>
+          <td><code>resize2fs /dev/device</code></td>
+          <td>传统Linux系统</td>
+      </tr>
+      <tr>
+          <td><strong>Btrfs</strong></td>
+          <td><code>btrfs filesystem resize max /path</code></td>
+          <td>支持高级功能场景</td>
+      </tr>
+      <tr>
+          <td><strong>LVM + XFS</strong></td>
+          <td><code>pvresize → lvextend → xfs_growfs</code></td>
+          <td>复杂存储环境</td>
+      </tr>
+      <tr>
+          <td><strong>ZFS</strong></td>
+          <td><code>zpool online -e pool device</code></td>
+          <td>企业级存储</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="lvm环境的扩容步骤">LVM环境的扩容步骤</h3>
+<p>如果使用LVM，步骤会稍微复杂一些：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. 扩展物理卷</span>
+</span></span><span style="display:flex;"><span>pvresize /dev/nvme0n1p1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 扩展逻辑卷</span>
+</span></span><span style="display:flex;"><span>lvextend -l +100%FREE /dev/mapper/centos-root
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 扩展文件系统</span>
+</span></span><span style="display:flex;"><span>xfs_growfs /  <span style="color:#75715e"># 对于XFS</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># resize2fs /dev/mapper/centos-root  # 对于ext4</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="-实战总结">🎯 实战总结</h2>
+<p>这次磁盘扩容让我再次深刻理解了一个道理：<strong>云平台的扩容只是第一步，真正让空间可用的是操作系统和文件系统的配合</strong>。</p>
+<h3 id="核心要点">核心要点</h3>
+<ol>
+<li><strong>三层模型</strong>：云存储 → 分区表 → 文件系统，缺一不可</li>
+<li><strong>工具选择</strong>：<code>growpart</code> + <code>xfs_growfs</code>，简单高效</li>
+<li><strong>风险控制</strong>：在线操作，无数据移动，风险可控</li>
+</ol>
+<h3 id="经验教训">经验教训</h3>
+<ul>
+<li>云控制台扩容后别忘了OS层操作</li>
+<li>不同文件系统的命令要区分清楚</li>
+<li>提前了解支持矩阵，避免踩坑</li>
+</ul>
+<h3 id="一句话总结">一句话总结</h3>
+<p><strong>EBS让磁盘变大，但只有growpart和xfs_growfs才能让空间真正可用。</strong></p>
+<hr>
+<h2 id="-写在最后">📞 写在最后</h2>
+<p>磁盘扩容看起来简单，但涉及的知识点还是挺多的。希望这次的记录能帮助到遇到类似问题的朋友们。</p>
+<p>如果你在操作过程中遇到问题，欢迎交流讨论。运维路上，互相学习，共同进步！</p>
+<hr>
+<blockquote>
+<p><strong>关于作者</strong>：资深Linux运维工程师，专注于云平台和存储技术。在生产环境处理过数百次各类扩容操作，对存储系统有深入理解。</p>
+</blockquote>
+<p><strong>标签</strong>：<code>AWS</code> <code>EBS</code> <code>磁盘扩容</code> <code>XFS</code> <code>Linux运维</code> <code>云存储</code></p>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/kaka-milan-22" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/kaka99859362" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+<a href="mailto:kaka@kakacn.com" target="_blank" rel="noopener noreferrer me"
+    title="Email">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2026 Kaka.
+        
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

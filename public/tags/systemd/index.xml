@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Systemd on 我的技术博客</title>
+    <link>http://localhost:1313/tags/systemd/</link>
+    <description>Recent content in Systemd on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Mon, 16 Feb 2026 14:29:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/systemd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>深入理解 Linux 启动过程：从 BIOS 到用户登录</title>
+      <link>http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/</link>
+      <pubDate>Mon, 16 Feb 2026 14:29:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Linux 系统的启动过程是一个复杂而精密的过程，涉及固件、引导加载器、内核、init 系统等多个组件的协同工作。对于运维工程师来说，深入理解启动过程不仅有助于快速定位系统启动故障，还能优化启动性能、实现系统定制化配置。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

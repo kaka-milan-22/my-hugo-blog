@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>容器 on 我的技术博客</title>
+    <link>http://localhost:1313/tags/%E5%AE%B9%E5%99%A8/</link>
+    <description>Recent content in 容器 on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Mon, 16 Feb 2026 16:23:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/%E5%AE%B9%E5%99%A8/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Docker 核心组件深度解析：从镜像到编排的完整指南</title>
+      <link>http://localhost:1313/posts/2026-02-16-docker-components-deep-dive/</link>
+      <pubDate>Mon, 16 Feb 2026 16:23:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-docker-components-deep-dive/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Docker 作为容器技术的事实标准，已经成为现代运维工程师必须掌握的核心技能。它通过提供一致的运行环境，彻底解决了&amp;quot;在我的机器上可以运行&amp;quot;的经典问题。本文将深入剖析 Docker 的各个核心组件，从底层原理到实际应用，帮助运维工程师全面理解并高效使用 Docker。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

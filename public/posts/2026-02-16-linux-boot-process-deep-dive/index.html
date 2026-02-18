@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="zh"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">深入理解 Linux 启动过程：从 BIOS 到用户登录 | 我的技术博客</title>
+<meta property="og:title" content="深入理解 Linux 启动过程：从 BIOS 到用户登录 | 我的技术博客" />
+<meta name="twitter:title" content="深入理解 Linux 启动过程：从 BIOS 到用户登录 | 我的技术博客" />
+<meta itemprop="name" content="深入理解 Linux 启动过程：从 BIOS 到用户登录 | 我的技术博客" />
+<meta name="application-name" content="深入理解 Linux 启动过程：从 BIOS 到用户登录 | 我的技术博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="深入剖析 Linux 系统完整的启动流程，从固件初始化到用户登录的每个阶段，帮助运维工程师理解系统启动的底层机制和故障排查方法。">
+<meta itemprop="description" content="深入剖析 Linux 系统完整的启动流程，从固件初始化到用户登录的每个阶段，帮助运维工程师理解系统启动的底层机制和故障排查方法。" />
+<meta property="og:description" content="深入剖析 Linux 系统完整的启动流程，从固件初始化到用户登录的每个阶段，帮助运维工程师理解系统启动的底层机制和故障排查方法。" />
+<meta name="twitter:description" content="深入剖析 Linux 系统完整的启动流程，从固件初始化到用户登录的每个阶段，帮助运维工程师理解系统启动的底层机制和故障排查方法。" />
+
+<meta property="og:locale" content="zh" />
+<meta name="language" content="zh" />
+
+  <link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/" title="中文" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-02-16T14:29:00&#43;0800 />
+    <meta property="article:published_time" content=2026-02-16T14:29:00&#43;0800 />
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/" />
+
+    
+    <meta property="og:article:author" content="Kaka" />
+    <meta property="article:author" content="Kaka" />
+    <meta name="author" content="Kaka" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "深入理解 Linux 启动过程：从 BIOS 到用户登录",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-02-16",
+        "description": "深入剖析 Linux 系统完整的启动流程，从固件初始化到用户登录的每个阶段，帮助运维工程师理解系统启动的底层机制和故障排查方法。",
+        "wordCount":  5209 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-02-16",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "我的技术博客"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.154.3">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/">
+  <meta property="og:site_name" content="我的技术博客">
+  <meta property="og:title" content="深入理解 Linux 启动过程：从 BIOS 到用户登录">
+  <meta property="og:description" content="深入剖析 Linux 系统完整的启动流程，从固件初始化到用户登录的每个阶段，帮助运维工程师理解系统启动的底层机制和故障排查方法。">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-16T14:29:00+08:00">
+    <meta property="article:modified_time" content="2026-02-16T14:29:00+08:00">
+    <meta property="article:tag" content="Linux">
+    <meta property="article:tag" content="Boot">
+    <meta property="article:tag" content="System">
+    <meta property="article:tag" content="Kernel">
+    <meta property="article:tag" content="Systemd">
+    <meta property="article:tag" content="运维">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="深入理解 Linux 启动过程：从 BIOS 到用户登录">
+  <meta name="twitter:description" content="深入剖析 Linux 系统完整的启动流程，从固件初始化到用户登录的每个阶段，帮助运维工程师理解系统启动的底层机制和故障排查方法。">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/2026-02-16-linux-boot-process-deep-dive/">
+    <link href="/style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title></title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        首页
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/posts/">
+                        文章
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/tags/">
+                        标签
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">深入理解 Linux 启动过程：从 BIOS 到用户登录</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-02-16T14:29:00&#43;08:00" itemprop="datePublished"> 2026年2月16日 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b></b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#linux-启动的六大阶段">Linux 启动的六大阶段</a></li>
+    <li><a href="#阶段一固件初始化biosuefi">阶段一：固件初始化（BIOS/UEFI）</a>
+      <ul>
+        <li><a href="#bios-模式启动">BIOS 模式启动</a></li>
+        <li><a href="#uefi-模式启动">UEFI 模式启动</a></li>
+      </ul>
+    </li>
+    <li><a href="#阶段二引导加载器grub2">阶段二：引导加载器（GRUB2）</a>
+      <ul>
+        <li><a href="#grub2-的工作阶段">GRUB2 的工作阶段</a></li>
+        <li><a href="#grub2-配置文件">GRUB2 配置文件</a></li>
+        <li><a href="#grub2-故障恢复">GRUB2 故障恢复</a></li>
+      </ul>
+    </li>
+    <li><a href="#阶段三内核初始化">阶段三：内核初始化</a>
+      <ul>
+        <li><a href="#内核加载过程">内核加载过程</a></li>
+        <li><a href="#内核初始化步骤">内核初始化步骤</a></li>
+      </ul>
+    </li>
+    <li><a href="#阶段四initramfs-阶段">阶段四：Initramfs 阶段</a>
+      <ul>
+        <li><a href="#initramfs-的作用">Initramfs 的作用</a></li>
+        <li><a href="#initramfs-执行流程">Initramfs 执行流程</a></li>
+      </ul>
+    </li>
+    <li><a href="#阶段五systemd-初始化">阶段五：Systemd 初始化</a>
+      <ul>
+        <li><a href="#systemd-的核心概念">Systemd 的核心概念</a></li>
+        <li><a href="#systemd-启动流程">Systemd 启动流程</a></li>
+        <li><a href="#分析启动性能">分析启动性能</a></li>
+        <li><a href="#常见服务管理">常见服务管理</a></li>
+      </ul>
+    </li>
+    <li><a href="#阶段六用户空间启动">阶段六：用户空间启动</a>
+      <ul>
+        <li><a href="#登录管理器">登录管理器</a></li>
+        <li><a href="#用户登录流程">用户登录流程</a></li>
+        <li><a href="#系统初始化脚本">系统初始化脚本</a></li>
+      </ul>
+    </li>
+    <li><a href="#启动故障排查">启动故障排查</a>
+      <ul>
+        <li><a href="#常见启动问题">常见启动问题</a></li>
+        <li><a href="#启动日志分析">启动日志分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#优化启动速度">优化启动速度</a>
+      <ul>
+        <li><a href="#禁用不必要的服务">禁用不必要的服务</a></li>
+        <li><a href="#并行化启动">并行化启动</a></li>
+        <li><a href="#使用静态-ip避免-dhcp-等待">使用静态 IP（避免 DHCP 等待）</a></li>
+        <li><a href="#减少-grub-超时">减少 GRUB 超时</a></li>
+      </ul>
+    </li>
+    <li><a href="#linux-启动流程图">Linux 启动流程图</a>
+      <ul>
+        <li><a href="#流程图说明">流程图说明</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <h2 id="引言">引言</h2>
+<p>Linux 系统的启动过程是一个复杂而精密的过程，涉及固件、引导加载器、内核、init 系统等多个组件的协同工作。对于运维工程师来说，深入理解启动过程不仅有助于快速定位系统启动故障，还能优化启动性能、实现系统定制化配置。</p>
+<p>本文将从底层硬件到用户空间，详细剖析现代 Linux 系统（以 UEFI + Systemd 为例）的完整启动流程，并提供实用的故障排查技巧。</p>
+<h2 id="linux-启动的六大阶段">Linux 启动的六大阶段</h2>
+<p>Linux 系统启动可以分为以下六个主要阶段：</p>
+<ol>
+<li><strong>固件阶段（BIOS/UEFI）</strong></li>
+<li><strong>引导加载器阶段（GRUB2）</strong></li>
+<li><strong>内核初始化阶段</strong></li>
+<li><strong>Initramfs 阶段</strong></li>
+<li><strong>Init 系统阶段（Systemd）</strong></li>
+<li><strong>用户空间启动阶段</strong></li>
+</ol>
+<h2 id="阶段一固件初始化biosuefi">阶段一：固件初始化（BIOS/UEFI）</h2>
+<h3 id="bios-模式启动">BIOS 模式启动</h3>
+<p>传统 BIOS（Basic Input/Output System）是计算机启动时执行的第一段代码：</p>
+<p><strong>工作流程：</strong></p>
+<ol>
+<li><strong>POST（加电自检）</strong>：检测 CPU、内存、硬件设备</li>
+<li><strong>读取 MBR</strong>：从启动设备的 MBR（Master Boot Record，前 512 字节）加载引导代码</li>
+<li><strong>转交控制权</strong>：跳转到 MBR 中的引导代码（通常是 GRUB Stage 1）</li>
+</ol>
+<p><strong>MBR 结构：</strong></p>
+<pre tabindex="0"><code>偏移量          大小        内容
+0x000 - 0x1BD   446字节     引导代码（Boot Loader Stage 1）
+0x1BE - 0x1FD   64字节      分区表（4个分区条目，每个16字节）
+0x1FE - 0x1FF   2字节       魔数（0x55AA，表示有效的引导扇区）
+</code></pre><h3 id="uefi-模式启动">UEFI 模式启动</h3>
+<p>现代系统普遍采用 UEFI（Unified Extensible Firmware Interface）：</p>
+<p><strong>优势：</strong></p>
+<ul>
+<li>支持 GPT 分区表（突破 MBR 的 2TB 限制）</li>
+<li>提供图形化界面和网络功能</li>
+<li>安全启动（Secure Boot）机制</li>
+<li>更快的启动速度</li>
+</ul>
+<p><strong>工作流程：</strong></p>
+<ol>
+<li><strong>固件初始化</strong>：初始化硬件，加载 UEFI 驱动</li>
+<li><strong>读取 ESP</strong>：从 EFI 系统分区（ESP）读取引导文件</li>
+<li><strong>加载 Boot Loader</strong>：执行 <code>/EFI/[发行版]/grubx64.efi</code> 等引导程序</li>
+</ol>
+<p><strong>查看 UEFI 引导条目：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看当前引导条目</span>
+</span></span><span style="display:flex;"><span>efibootmgr -v
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例输出</span>
+</span></span><span style="display:flex;"><span>BootCurrent: <span style="color:#ae81ff">0001</span>
+</span></span><span style="display:flex;"><span>BootOrder: 0001,0000,0002
+</span></span><span style="display:flex;"><span>Boot0000* Windows Boot Manager
+</span></span><span style="display:flex;"><span>Boot0001* ubuntu	HD<span style="color:#f92672">(</span>1,GPT,...<span style="color:#f92672">)</span>/File<span style="color:#f92672">(</span><span style="color:#ae81ff">\E</span>FI<span style="color:#ae81ff">\u</span>buntu<span style="color:#ae81ff">\s</span>himx64.efi<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Boot0002* UEFI: Built-in EFI Shell
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>检查 ESP 分区：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查找 ESP 分区</span>
+</span></span><span style="display:flex;"><span>lsblk -f | grep vfat
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 挂载并检查内容</span>
+</span></span><span style="display:flex;"><span>mount /dev/sda1 /boot/efi
+</span></span><span style="display:flex;"><span>tree /boot/efi/EFI
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="阶段二引导加载器grub2">阶段二：引导加载器（GRUB2）</h2>
+<p>GRUB2（GRand Unified Bootloader version 2）是目前最流行的 Linux 引导加载器。</p>
+<h3 id="grub2-的工作阶段">GRUB2 的工作阶段</h3>
+<p><strong>Stage 1（boot.img）</strong>：</p>
+<ul>
+<li>位置：MBR 或 ESP 分区</li>
+<li>大小：512 字节（BIOS）或更大（UEFI）</li>
+<li>功能：加载 Stage 1.5</li>
+</ul>
+<p><strong>Stage 1.5（core.img）</strong>：</p>
+<ul>
+<li>位置：MBR 后的间隙或 <code>/boot/grub</code> 目录</li>
+<li>功能：包含文件系统驱动，能读取 <code>/boot</code> 分区</li>
+</ul>
+<p><strong>Stage 2</strong>：</p>
+<ul>
+<li>位置：<code>/boot/grub/</code> 目录</li>
+<li>功能：加载完整的 GRUB2 环境，显示启动菜单</li>
+</ul>
+<h3 id="grub2-配置文件">GRUB2 配置文件</h3>
+<p>主配置文件：<code>/boot/grub/grub.cfg</code>（自动生成，不建议手动编辑）</p>
+<p><strong>查看配置：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cat /boot/grub/grub.cfg | grep menuentry
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>自定义配置目录：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 主配置</span>
+</span></span><span style="display:flex;"><span>/etc/default/grub
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 自定义脚本</span>
+</span></span><span style="display:flex;"><span>/etc/grub.d/
+</span></span><span style="display:flex;"><span>├── 00_header          <span style="color:#75715e"># 基础设置</span>
+</span></span><span style="display:flex;"><span>├── 10_linux           <span style="color:#75715e"># Linux 内核条目</span>
+</span></span><span style="display:flex;"><span>├── 20_linux_xen       <span style="color:#75715e"># Xen 虚拟化</span>
+</span></span><span style="display:flex;"><span>├── 30_os-prober       <span style="color:#75715e"># 检测其他操作系统</span>
+</span></span><span style="display:flex;"><span>└── 40_custom          <span style="color:#75715e"># 自定义条目</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>常用配置示例：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># /etc/default/grub</span>
+</span></span><span style="display:flex;"><span>GRUB_TIMEOUT<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>                          <span style="color:#75715e"># 菜单超时时间</span>
+</span></span><span style="display:flex;"><span>GRUB_DEFAULT<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>                          <span style="color:#75715e"># 默认启动项</span>
+</span></span><span style="display:flex;"><span>GRUB_CMDLINE_LINUX_DEFAULT<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;quiet splash&#34;</span>  <span style="color:#75715e"># 内核参数</span>
+</span></span><span style="display:flex;"><span>GRUB_CMDLINE_LINUX<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;net.ifnames=0&#34;</span>      <span style="color:#75715e"># 额外内核参数</span>
+</span></span><span style="display:flex;"><span>GRUB_GFXMODE<span style="color:#f92672">=</span>1024x768                   <span style="color:#75715e"># 图形模式分辨率</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>更新 GRUB 配置：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Debian/Ubuntu</span>
+</span></span><span style="display:flex;"><span>update-grub
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># RHEL/CentOS</span>
+</span></span><span style="display:flex;"><span>grub2-mkconfig -o /boot/grub2/grub.cfg
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># UEFI 系统</span>
+</span></span><span style="display:flex;"><span>grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="grub2-故障恢复">GRUB2 故障恢复</h3>
+<p><strong>进入 GRUB 救援模式：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># GRUB 救援 shell</span>
+</span></span><span style="display:flex;"><span>grub rescue&gt; ls                         <span style="color:#75715e"># 列出分区</span>
+</span></span><span style="display:flex;"><span>grub rescue&gt; ls <span style="color:#f92672">(</span>hd0,msdos1<span style="color:#f92672">)</span>/           <span style="color:#75715e"># 查看分区内容</span>
+</span></span><span style="display:flex;"><span>grub rescue&gt; set root<span style="color:#f92672">=(</span>hd0,msdos1<span style="color:#f92672">)</span>      <span style="color:#75715e"># 设置根分区</span>
+</span></span><span style="display:flex;"><span>grub rescue&gt; set prefix<span style="color:#f92672">=(</span>hd0,msdos1<span style="color:#f92672">)</span>/boot/grub
+</span></span><span style="display:flex;"><span>grub rescue&gt; insmod normal              <span style="color:#75715e"># 加载 normal 模块</span>
+</span></span><span style="display:flex;"><span>grub rescue&gt; normal                     <span style="color:#75715e"># 进入正常模式</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>重新安装 GRUB：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 从 Live CD 启动后</span>
+</span></span><span style="display:flex;"><span>mount /dev/sda1 /mnt
+</span></span><span style="display:flex;"><span>mount --bind /dev /mnt/dev
+</span></span><span style="display:flex;"><span>mount --bind /proc /mnt/proc
+</span></span><span style="display:flex;"><span>mount --bind /sys /mnt/sys
+</span></span><span style="display:flex;"><span>chroot /mnt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># BIOS 系统</span>
+</span></span><span style="display:flex;"><span>grub-install /dev/sda
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># UEFI 系统</span>
+</span></span><span style="display:flex;"><span>grub-install --target<span style="color:#f92672">=</span>x86_64-efi --efi-directory<span style="color:#f92672">=</span>/boot/efi
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="阶段三内核初始化">阶段三：内核初始化</h2>
+<h3 id="内核加载过程">内核加载过程</h3>
+<p>GRUB 将内核镜像和 initramfs 加载到内存后，跳转到内核入口点。</p>
+<p><strong>内核启动参数：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看当前内核参数</span>
+</span></span><span style="display:flex;"><span>cat /proc/cmdline
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例输出</span>
+</span></span><span style="display:flex;"><span>BOOT_IMAGE<span style="color:#f92672">=</span>/vmlinuz-5.15.0-56-generic root<span style="color:#f92672">=</span>UUID<span style="color:#f92672">=</span>xxx ro quiet splash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>常用内核参数：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ro                    <span style="color:#75715e"># 只读挂载根文件系统（稍后重新挂载为读写）</span>
+</span></span><span style="display:flex;"><span>quiet                 <span style="color:#75715e"># 减少启动信息输出</span>
+</span></span><span style="display:flex;"><span>splash                <span style="color:#75715e"># 显示启动画面</span>
+</span></span><span style="display:flex;"><span>init<span style="color:#f92672">=</span>/bin/bash        <span style="color:#75715e"># 指定 init 程序（故障恢复用）</span>
+</span></span><span style="display:flex;"><span>single / <span style="color:#ae81ff">1</span>            <span style="color:#75715e"># 单用户模式</span>
+</span></span><span style="display:flex;"><span>systemd.unit<span style="color:#f92672">=</span>rescue.target  <span style="color:#75715e"># 启动到救援模式</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="内核初始化步骤">内核初始化步骤</h3>
+<ol>
+<li><strong>解压缩</strong>：解压缩内核镜像（vmlinuz）</li>
+<li><strong>硬件检测</strong>：初始化 CPU、内存、设备驱动</li>
+<li><strong>挂载 rootfs</strong>：挂载临时根文件系统</li>
+<li><strong>加载 initramfs</strong>：解压并切换到 initramfs</li>
+<li><strong>启动 init 进程</strong>：启动 PID 1 进程（通常是 systemd）</li>
+</ol>
+<p><strong>查看内核日志：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 内核环形缓冲区</span>
+</span></span><span style="display:flex;"><span>dmesg | less
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看特定阶段</span>
+</span></span><span style="display:flex;"><span>dmesg | grep -i <span style="color:#e6db74">&#34;boot&#34;</span>
+</span></span><span style="display:flex;"><span>dmesg | grep -i <span style="color:#e6db74">&#34;mounted root&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 持久化日志</span>
+</span></span><span style="display:flex;"><span>journalctl -k        <span style="color:#75715e"># 仅查看内核日志</span>
+</span></span><span style="display:flex;"><span>journalctl -b        <span style="color:#75715e"># 查看本次启动日志</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>分析启动耗时：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 内核启动耗时</span>
+</span></span><span style="display:flex;"><span>systemd-analyze time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出示例</span>
+</span></span><span style="display:flex;"><span>Startup finished in 3.5s <span style="color:#f92672">(</span>firmware<span style="color:#f92672">)</span> + 2.1s <span style="color:#f92672">(</span>loader<span style="color:#f92672">)</span> + 4.2s <span style="color:#f92672">(</span>kernel<span style="color:#f92672">)</span> + 5.8s <span style="color:#f92672">(</span>userspace<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> 15.6s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="阶段四initramfs-阶段">阶段四：Initramfs 阶段</h2>
+<h3 id="initramfs-的作用">Initramfs 的作用</h3>
+<p>Initramfs（Initial RAM File System）是一个临时的根文件系统，提供必要的工具和驱动来挂载真正的根文件系统。</p>
+<p><strong>为什么需要 Initramfs？</strong></p>
+<ul>
+<li>根分区可能在 LVM、RAID、加密卷或网络文件系统上</li>
+<li>内核无法内置所有驱动，需要动态加载</li>
+<li>提供早期用户空间环境</li>
+</ul>
+<p><strong>查看 Initramfs 内容：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 解压 initramfs</span>
+</span></span><span style="display:flex;"><span>mkdir /tmp/initramfs
+</span></span><span style="display:flex;"><span>cd /tmp/initramfs
+</span></span><span style="display:flex;"><span>unmkinitramfs /boot/initrd.img-<span style="color:#66d9ef">$(</span>uname -r<span style="color:#66d9ef">)</span> .
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 或者</span>
+</span></span><span style="display:flex;"><span>lsinitramfs /boot/initrd.img-<span style="color:#66d9ef">$(</span>uname -r<span style="color:#66d9ef">)</span> | less
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>重建 Initramfs：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># Debian/Ubuntu</span>
+</span></span><span style="display:flex;"><span>update-initramfs -u
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># RHEL/CentOS</span>
+</span></span><span style="display:flex;"><span>dracut --force
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 指定特定内核版本</span>
+</span></span><span style="display:flex;"><span>mkinitramfs -o /boot/initrd.img-5.15.0-56 5.15.0-56-generic
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="initramfs-执行流程">Initramfs 执行流程</h3>
+<ol>
+<li><strong>挂载 /proc、/sys、/dev</strong></li>
+<li><strong>加载必要的内核模块</strong>（存储驱动、文件系统驱动）</li>
+<li><strong>设备检测</strong>：运行 udev，创建设备节点</li>
+<li><strong>挂载真正的根文件系统</strong></li>
+<li><strong>切换根</strong>：<code>switch_root</code> 到真实的根文件系统</li>
+<li><strong>启动 systemd</strong></li>
+</ol>
+<p><strong>查看 initramfs 的 init 脚本：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看初始化脚本</span>
+</span></span><span style="display:flex;"><span>cat /tmp/initramfs/init
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看关键函数</span>
+</span></span><span style="display:flex;"><span>grep -A <span style="color:#ae81ff">10</span> <span style="color:#e6db74">&#34;mount_root&#34;</span> /tmp/initramfs/init
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="阶段五systemd-初始化">阶段五：Systemd 初始化</h2>
+<p>Systemd 作为现代 Linux 的 init 系统（PID 1），负责启动和管理所有系统服务。</p>
+<h3 id="systemd-的核心概念">Systemd 的核心概念</h3>
+<p><strong>Unit 类型：</strong></p>
+<ul>
+<li><strong>service</strong>：系统服务（如 nginx.service）</li>
+<li><strong>target</strong>：一组 unit 的集合（如 multi-user.target）</li>
+<li><strong>mount</strong>：挂载点（如 /home）</li>
+<li><strong>socket</strong>：套接字激活</li>
+<li><strong>timer</strong>：定时任务（替代 cron）</li>
+<li><strong>device</strong>：设备单元</li>
+</ul>
+<p><strong>Target 层级关系：</strong></p>
+<pre tabindex="0"><code>systemd
+└── default.target (通常是 graphical.target 或 multi-user.target)
+    ├── multi-user.target
+    │   ├── basic.target
+    │   │   ├── sysinit.target
+    │   │   │   ├── local-fs.target
+    │   │   │   ├── swap.target
+    │   │   │   └── cryptsetup.target
+    │   │   └── sockets.target
+    │   ├── network.target
+    │   ├── sshd.service
+    │   └── ...其他服务
+    └── display-manager.service (仅 graphical.target)
+</code></pre><h3 id="systemd-启动流程">Systemd 启动流程</h3>
+<ol>
+<li><strong>加载默认 target</strong>：</li>
+</ol>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看默认 target</span>
+</span></span><span style="display:flex;"><span>systemctl get-default
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 设置默认 target</span>
+</span></span><span style="display:flex;"><span>systemctl set-default multi-user.target
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li><strong>并行启动依赖的 units</strong>：</li>
+</ol>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看 multi-user.target 的依赖</span>
+</span></span><span style="display:flex;"><span>systemctl list-dependencies multi-user.target
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li><strong>挂载文件系统</strong>：</li>
+</ol>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看挂载单元</span>
+</span></span><span style="display:flex;"><span>systemctl list-units --type<span style="color:#f92672">=</span>mount
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看 /etc/fstab 生成的挂载单元</span>
+</span></span><span style="display:flex;"><span>ls /run/systemd/generator/*.mount
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="4">
+<li><strong>启动网络服务</strong>：</li>
+</ol>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>systemctl status NetworkManager
+</span></span><span style="display:flex;"><span>systemctl status systemd-networkd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="5">
+<li><strong>启动关键系统服务</strong>：</li>
+</ol>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看所有服务状态</span>
+</span></span><span style="display:flex;"><span>systemctl list-units --type<span style="color:#f92672">=</span>service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="分析启动性能">分析启动性能</h3>
+<p><strong>查看启动耗时最长的服务：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>systemd-analyze blame
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出示例（前10个）</span>
+</span></span><span style="display:flex;"><span>     5.234s NetworkManager-wait-online.service
+</span></span><span style="display:flex;"><span>     3.456s plymouth-quit-wait.service
+</span></span><span style="display:flex;"><span>     2.123s systemd-networkd-wait-online.service
+</span></span><span style="display:flex;"><span>     1.567s accounts-daemon.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>生成启动链图：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 生成 SVG 图表</span>
+</span></span><span style="display:flex;"><span>systemd-analyze plot &gt; /tmp/boot.svg
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 生成依赖关系图</span>
+</span></span><span style="display:flex;"><span>systemd-analyze dot | dot -Tsvg &gt; /tmp/deps.svg
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>查看关键路径：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>systemd-analyze critical-chain
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出示例</span>
+</span></span><span style="display:flex;"><span>graphical.target @5.8s
+</span></span><span style="display:flex;"><span>└─multi-user.target @5.8s
+</span></span><span style="display:flex;"><span>  └─NetworkManager.service @3.2s +2.5s
+</span></span><span style="display:flex;"><span>    └─network-pre.target @3.1s
+</span></span><span style="display:flex;"><span>      └─firewalld.service @1.8s +1.2s
+</span></span><span style="display:flex;"><span>        └─basic.target @1.7s
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="常见服务管理">常见服务管理</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看服务状态</span>
+</span></span><span style="display:flex;"><span>systemctl status sshd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 启动/停止/重启服务</span>
+</span></span><span style="display:flex;"><span>systemctl start sshd
+</span></span><span style="display:flex;"><span>systemctl stop sshd
+</span></span><span style="display:flex;"><span>systemctl restart sshd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 开机自启</span>
+</span></span><span style="display:flex;"><span>systemctl enable sshd
+</span></span><span style="display:flex;"><span>systemctl disable sshd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看服务日志</span>
+</span></span><span style="display:flex;"><span>journalctl -u sshd -f
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看失败的服务</span>
+</span></span><span style="display:flex;"><span>systemctl --failed
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="阶段六用户空间启动">阶段六：用户空间启动</h2>
+<h3 id="登录管理器">登录管理器</h3>
+<p><strong>图形界面登录（Display Manager）：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 常见的显示管理器</span>
+</span></span><span style="display:flex;"><span>systemctl status gdm       <span style="color:#75715e"># GNOME</span>
+</span></span><span style="display:flex;"><span>systemctl status sddm      <span style="color:#75715e"># KDE</span>
+</span></span><span style="display:flex;"><span>systemctl status lightdm   <span style="color:#75715e"># 轻量级</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>文本界面登录（getty）：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看 getty 服务</span>
+</span></span><span style="display:flex;"><span>systemctl status getty@tty1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 配置虚拟终端数量</span>
+</span></span><span style="display:flex;"><span>ls /etc/systemd/system/getty.target.wants/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="用户登录流程">用户登录流程</h3>
+<ol>
+<li><strong>getty 或 display manager 启动</strong></li>
+<li><strong>用户认证</strong>：通过 PAM（Pluggable Authentication Modules）</li>
+<li><strong>加载用户环境</strong>：
+<ul>
+<li><code>/etc/profile</code>（全局）</li>
+<li><code>~/.bash_profile</code> 或 <code>~/.profile</code>（用户级）</li>
+<li><code>~/.bashrc</code>（非登录 shell）</li>
+</ul>
+</li>
+</ol>
+<p><strong>PAM 配置：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># SSH 登录的 PAM 配置</span>
+</span></span><span style="display:flex;"><span>cat /etc/pam.d/sshd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 示例内容</span>
+</span></span><span style="display:flex;"><span>auth       required     pam_sepermit.so
+</span></span><span style="display:flex;"><span>auth       substack     password-auth
+</span></span><span style="display:flex;"><span>account    required     pam_nologin.so
+</span></span><span style="display:flex;"><span>account    include      password-auth
+</span></span><span style="display:flex;"><span>password   include      password-auth
+</span></span><span style="display:flex;"><span>session    required     pam_loginuid.so
+</span></span><span style="display:flex;"><span>session    include      password-auth
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="系统初始化脚本">系统初始化脚本</h3>
+<p><strong>传统 SysVinit 脚本（兼容性）：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># rc.local（已过时，但某些系统仍支持）</span>
+</span></span><span style="display:flex;"><span>/etc/rc.local
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># systemd 兼容服务</span>
+</span></span><span style="display:flex;"><span>systemctl status rc-local
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Systemd 用户自定义服务：</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 创建开机自启脚本</span>
+</span></span><span style="display:flex;"><span>cat &gt; /etc/systemd/system/my-startup.service <span style="color:#e6db74">&lt;&lt;EOF
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[Unit]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Description=My Startup Script
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">After=network.target
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[Service]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Type=oneshot
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">ExecStart=/usr/local/bin/my-startup.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">RemainAfterExit=yes
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[Install]
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">WantedBy=multi-user.target
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>systemctl enable my-startup.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="启动故障排查">启动故障排查</h2>
+<h3 id="常见启动问题">常见启动问题</h3>
+<p><strong>1. GRUB 损坏</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 症状：无法找到引导设备，黑屏显示 &#34;grub rescue&gt;&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 解决：从 Live CD 重新安装 GRUB（参见前面章节）</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>2. 内核 Panic</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 症状：启动时出现 &#34;Kernel panic - not syncing&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 排查：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 检查 /boot 分区是否完整</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 尝试启动旧版本内核</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 检查硬件兼容性（特别是新硬件）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 从 GRUB 菜单选择旧内核启动</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>3. 根文件系统损坏</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 症状：initramfs 无法挂载根分区，进入紧急模式</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 解决：</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>initramfs<span style="color:#f92672">)</span> fsck /dev/sda1    <span style="color:#75715e"># 文件系统检查</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">(</span>initramfs<span style="color:#f92672">)</span> exit              <span style="color:#75715e"># 继续启动</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>4. Systemd 服务失败</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看失败的服务</span>
+</span></span><span style="display:flex;"><span>systemctl --failed
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 分析特定服务</span>
+</span></span><span style="display:flex;"><span>systemctl status failed-service
+</span></span><span style="display:flex;"><span>journalctl -xeu failed-service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>5. 进入紧急模式</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 在 GRUB 菜单按 &#39;e&#39; 编辑启动参数</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 在 linux 行末尾添加：</span>
+</span></span><span style="display:flex;"><span>systemd.unit<span style="color:#f92672">=</span>rescue.target     <span style="color:#75715e"># 救援模式</span>
+</span></span><span style="display:flex;"><span>systemd.unit<span style="color:#f92672">=</span>emergency.target  <span style="color:#75715e"># 紧急模式</span>
+</span></span><span style="display:flex;"><span>init<span style="color:#f92672">=</span>/bin/bash                 <span style="color:#75715e"># 直接进入 shell（无密码，需重新挂载根分区）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 紧急模式下重新挂载根分区为读写</span>
+</span></span><span style="display:flex;"><span>mount -o remount,rw /
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="启动日志分析">启动日志分析</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看本次启动日志</span>
+</span></span><span style="display:flex;"><span>journalctl -b
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看上次启动日志</span>
+</span></span><span style="display:flex;"><span>journalctl -b -1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看所有启动记录</span>
+</span></span><span style="display:flex;"><span>journalctl --list-boots
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看特定时间段</span>
+</span></span><span style="display:flex;"><span>journalctl --since <span style="color:#e6db74">&#34;2026-02-16 10:00:00&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看内核消息</span>
+</span></span><span style="display:flex;"><span>journalctl -k
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 持续监控</span>
+</span></span><span style="display:flex;"><span>journalctl -f
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="优化启动速度">优化启动速度</h2>
+<h3 id="禁用不必要的服务">禁用不必要的服务</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 查看启动耗时</span>
+</span></span><span style="display:flex;"><span>systemd-analyze blame
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 禁用不需要的服务（示例）</span>
+</span></span><span style="display:flex;"><span>systemctl disable bluetooth.service
+</span></span><span style="display:flex;"><span>systemctl disable ModemManager.service
+</span></span><span style="display:flex;"><span>systemctl disable NetworkManager-wait-online.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="并行化启动">并行化启动</h3>
+<p>Systemd 默认已经并行启动服务，但可以优化依赖关系：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 检查服务依赖</span>
+</span></span><span style="display:flex;"><span>systemctl list-dependencies --all sshd.service
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 自定义服务时，使用正确的依赖关系</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>Unit<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>After<span style="color:#f92672">=</span>network.target    <span style="color:#75715e"># 等待网络（不阻塞）</span>
+</span></span><span style="display:flex;"><span>Wants<span style="color:#f92672">=</span>network.target    <span style="color:#75715e"># 弱依赖（不强制）</span>
+</span></span><span style="display:flex;"><span>Requires<span style="color:#f92672">=</span>postgresql     <span style="color:#75715e"># 强依赖（必须成功）</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="使用静态-ip避免-dhcp-等待">使用静态 IP（避免 DHCP 等待）</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># NetworkManager 配置</span>
+</span></span><span style="display:flex;"><span>nmcli con mod eth0 ipv4.method manual <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  ipv4.addresses <span style="color:#e6db74">&#34;192.168.1.100/24&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  ipv4.gateway <span style="color:#e6db74">&#34;192.168.1.1&#34;</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  ipv4.dns <span style="color:#e6db74">&#34;8.8.8.8&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="减少-grub-超时">减少 GRUB 超时</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># /etc/default/grub</span>
+</span></span><span style="display:flex;"><span>GRUB_TIMEOUT<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 更新配置</span>
+</span></span><span style="display:flex;"><span>update-grub
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="linux-启动流程图">Linux 启动流程图</h2>
+<p>以下是完整的 Linux 启动流程图，展示了从加电到用户登录的全过程：</p>
+<pre tabindex="0"><code class="language-mermaid" data-lang="mermaid">graph TD
+    A[加电] --&gt; B{固件类型?}
+    B --&gt;|BIOS| C[BIOS POST 自检]
+    B --&gt;|UEFI| D[UEFI 固件初始化]
+    
+    C --&gt; E[读取 MBR]
+    E --&gt; F[加载 GRUB Stage 1]
+    
+    D --&gt; G[读取 ESP 分区]
+    G --&gt; H[加载 GRUB EFI]
+    
+    F --&gt; I[GRUB Stage 1.5&lt;br/&gt;core.img]
+    H --&gt; I
+    I --&gt; J[GRUB Stage 2&lt;br/&gt;加载配置文件]
+    
+    J --&gt; K[显示启动菜单&lt;br/&gt;等待用户选择]
+    K --&gt; L[加载内核 vmlinuz]
+    L --&gt; M[加载 initramfs]
+    
+    M --&gt; N[内核解压缩]
+    N --&gt; O[内核初始化&lt;br/&gt;CPU/内存/设备]
+    O --&gt; P[挂载临时根文件系统]
+    P --&gt; Q[解压 initramfs 到内存]
+    
+    Q --&gt; R[执行 /init 脚本]
+    R --&gt; S[加载必要驱动&lt;br/&gt;存储/文件系统]
+    S --&gt; T[运行 udev&lt;br/&gt;设备管理]
+    T --&gt; U{根分区类型?}
+    
+    U --&gt;|普通分区| V[挂载根分区]
+    U --&gt;|LVM| W[激活 LVM 卷组]
+    U --&gt;|RAID| X[组装 RAID 阵列]
+    U --&gt;|加密| Y[解锁 LUKS 加密卷]
+    
+    W --&gt; V
+    X --&gt; V
+    Y --&gt; V
+    
+    V --&gt; Z[switch_root&lt;br/&gt;切换到真实根分区]
+    Z --&gt; AA[启动 systemd&lt;br/&gt;PID 1]
+    
+    AA --&gt; AB[加载默认 target&lt;br/&gt;default.target]
+    AB --&gt; AC[sysinit.target&lt;br/&gt;系统初始化]
+    
+    AC --&gt; AD[挂载 /etc/fstab&lt;br/&gt;中的文件系统]
+    AD --&gt; AE[启动 swap 交换空间]
+    AE --&gt; AF[启动 udev&lt;br/&gt;设备管理]
+    AF --&gt; AG[加载内核模块]
+    AG --&gt; AH[设置主机名&lt;br/&gt;时区等]
+    
+    AH --&gt; AI[basic.target&lt;br/&gt;基础系统]
+    AI --&gt; AJ[启动 socket 服务]
+    AJ --&gt; AK[启动 timer 定时器]
+    
+    AK --&gt; AL{运行级别?}
+    AL --&gt;|多用户| AM[multi-user.target]
+    AL --&gt;|图形界面| AN[graphical.target]
+    
+    AM --&gt; AO[启动网络服务&lt;br/&gt;NetworkManager]
+    AN --&gt; AO
+    AO --&gt; AP[启动系统服务&lt;br/&gt;SSH/Cron/日志等]
+    
+    AP --&gt; AQ{目标?}
+    AQ --&gt;|多用户| AR[启动 getty@tty1-6&lt;br/&gt;文本登录]
+    AQ --&gt;|图形| AS[启动显示管理器&lt;br/&gt;GDM/SDDM]
+    
+    AR --&gt; AT[等待用户登录]
+    AS --&gt; AT
+    
+    AT --&gt; AU[PAM 认证]
+    AU --&gt; AV[加载用户环境&lt;br/&gt;/etc/profile]
+    AV --&gt; AW[加载用户配置&lt;br/&gt;~/.bashrc]
+    AW --&gt; AX[启动用户 shell&lt;br/&gt;或图形会话]
+    
+    AX --&gt; AY[系统完全启动&lt;br/&gt;用户可用]
+    
+    style A fill:#ff6b6b
+    style AY fill:#51cf66
+    style AA fill:#4dabf7
+    style L fill:#ffd43b
+    style V fill:#ff922b
+</code></pre><h3 id="流程图说明">流程图说明</h3>
+<p><strong>关键阶段标识：</strong></p>
+<ul>
+<li>🔴 <strong>红色（加电）</strong>：硬件启动</li>
+<li>🟡 <strong>黄色（内核加载）</strong>：GRUB 引导阶段</li>
+<li>🟠 <strong>橙色（根分区挂载）</strong>：Initramfs 阶段</li>
+<li>🔵 <strong>蓝色（Systemd）</strong>：Init 系统阶段</li>
+<li>🟢 <strong>绿色（完成）</strong>：用户登录完成</li>
+</ul>
+<p><strong>时间估算（典型现代系统）：</strong></p>
+<ol>
+<li>固件阶段：2-4 秒</li>
+<li>GRUB 阶段：1-2 秒（不计用户等待）</li>
+<li>内核 + Initramfs：3-5 秒</li>
+<li>Systemd 初始化：5-10 秒</li>
+<li>用户空间：2-5 秒</li>
+</ol>
+<p><strong>总计：约 15-30 秒（取决于硬件和配置）</strong></p>
+<h2 id="总结">总结</h2>
+<p>Linux 启动过程是一个层次分明、逻辑严密的过程：</p>
+<ol>
+<li><strong>固件层</strong>：BIOS/UEFI 完成硬件初始化和引导设备定位</li>
+<li><strong>引导层</strong>：GRUB 提供多系统启动和内核参数配置</li>
+<li><strong>内核层</strong>：Linux 内核初始化硬件、加载驱动</li>
+<li><strong>初始化层</strong>：Initramfs 提供早期用户空间，挂载真实根分区</li>
+<li><strong>系统层</strong>：Systemd 并行启动系统服务</li>
+<li><strong>用户层</strong>：登录管理器提供用户认证和环境</li>
+</ol>
+<p>掌握这些知识，运维工程师可以：</p>
+<ul>
+<li>快速定位启动故障（GRUB 损坏、内核 panic、服务失败）</li>
+<li>优化启动性能（禁用服务、减少超时、并行化）</li>
+<li>实现高级配置（自定义内核参数、early boot 脚本、rescue 模式）</li>
+<li>理解系统架构（依赖关系、服务管理、日志分析）</li>
+</ul>
+<p><strong>延伸阅读：</strong></p>
+<ul>
+<li><a href="https://systemd.io/">systemd 官方文档</a></li>
+<li><a href="https://www.gnu.org/software/grub/manual/">GRUB2 手册</a></li>
+<li><a href="https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html">Linux 内核启动参数</a></li>
+<li><a href="https://www.kernel.org/doc/html/latest/admin-guide/init.html">The Linux Boot Process</a></li>
+</ul>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/kaka-milan-22" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/kaka99859362" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+<a href="mailto:kaka@kakacn.com" target="_blank" rel="noopener noreferrer me"
+    title="Email">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2026 Kaka.
+        
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

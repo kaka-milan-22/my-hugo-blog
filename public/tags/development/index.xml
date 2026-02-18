@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Development on 我的技术博客</title>
+    <link>http://localhost:1313/tags/development/</link>
+    <description>Recent content in Development on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Mon, 16 Feb 2026 02:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/development/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>uv: Python 工具链的革命性突破</title>
+      <link>http://localhost:1313/posts/2026-02-16-uv-python-game-changer/</link>
+      <pubDate>Mon, 16 Feb 2026 02:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-uv-python-game-changer/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771213060325_image.png&#34; alt=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;Python 生态系统迎来了一个新标准，它叫做 &lt;strong&gt;uv&lt;/strong&gt;。由 &lt;a href=&#34;https://github.com/astral-sh/ruff&#34;&gt;Ruff&lt;/a&gt; 的创造者 Astral 团队开发，uv 是一个用 Rust 编写的&amp;quot;Python 版 Cargo&amp;quot;，代表着 Python 工具链的巨大飞跃。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

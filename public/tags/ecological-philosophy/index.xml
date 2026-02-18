@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ecological Philosophy on 我的技术博客</title>
+    <link>http://localhost:1313/tags/ecological-philosophy/</link>
+    <description>Recent content in Ecological Philosophy on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Tue, 20 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/ecological-philosophy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Avatar: When Civilizations Become Operating Systems</title>
+      <link>http://localhost:1313/posts/2026-01-20-avatar-operating-systems/</link>
+      <pubDate>Tue, 20 Jan 2026 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-01-20-avatar-operating-systems/</guid>
+      
+      <description>Avatar isn&amp;rsquo;t really about heroes or villains, but about what happens when two completely different  civilizational architectures collide head-on. Is there still a simple answer of &amp;ldquo;right&amp;rdquo; and &amp;ldquo;wrong&amp;rdquo;?</description>
+      
+    </item>
+    
+  </channel>
+</rss>

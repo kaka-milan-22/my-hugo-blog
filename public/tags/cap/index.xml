@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CAP on 我的技术博客</title>
+    <link>http://localhost:1313/tags/cap/</link>
+    <description>Recent content in CAP on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Mon, 16 Feb 2026 15:56:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/cap/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CAP 理论实战指南：分布式系统的权衡艺术</title>
+      <link>http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/</link>
+      <pubDate>Mon, 16 Feb 2026 15:56:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-16-cap-theorem-practical-guide/</guid>
+      
+      <description>&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;如果你是 DevOps 工程师或 SRE，你肯定遇到过这样的场景：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;凌晨 3 点，数据库主从延迟了 5 秒，用户投诉看到了过期数据&lt;/li&gt;
+&lt;li&gt;网络抖动导致集群脑裂，一半节点拒绝写入，另一半正常服务&lt;/li&gt;
+&lt;li&gt;产品经理要求&amp;quot;既要高可用，又要强一致性&amp;quot;，你该如何回应？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这些都是 CAP 理论在真实世界的具体体现。&lt;strong&gt;CAP 不是学术论文里的概念，而是每个运维人员每天都在面对的技术选择。&lt;/strong&gt;&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>网络技术 on 我的技术博客</title>
+    <link>http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/</link>
+    <description>Recent content in 网络技术 on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sat, 14 Feb 2026 12:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>互联网是如何工作的：从网络边缘到核心协议的完整解析</title>
+      <link>http://localhost:1313/posts/2026-02-14-internet-architecture/</link>
+      <pubDate>Sat, 14 Feb 2026 12:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-14-internet-architecture/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771047011956_internet.png&#34; alt=&#34;internet.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;前言那个看不见的世界&#34;&gt;前言：那个看不见的世界&lt;/h2&gt;
+&lt;p&gt;你有没有想过，当你在浏览器里输入 &lt;code&gt;www.google.com&lt;/code&gt; 按下回车的那一刻，到页面显示出来的这几百毫秒里，背后发生了什么？&lt;/p&gt;
+&lt;p&gt;你的数据包经历了一场怎样的旅程？它穿过了哪些设备？遵循了哪些规则？为什么全球几十亿台设备能够互相通信而不会乱套？&lt;/p&gt;
+&lt;p&gt;今天，我想带你一层一层剥开互联网的&amp;quot;洋葱&amp;quot;，看看这个已经运行了50多年的系统，是如何精妙地组织起来的。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

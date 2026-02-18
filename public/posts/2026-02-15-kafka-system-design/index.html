@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh"><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="content-type" content="text/html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title itemprop="name">系统设计：为什么 Kafka 如此流行？ | 我的技术博客</title>
+<meta property="og:title" content="系统设计：为什么 Kafka 如此流行？ | 我的技术博客" />
+<meta name="twitter:title" content="系统设计：为什么 Kafka 如此流行？ | 我的技术博客" />
+<meta itemprop="name" content="系统设计：为什么 Kafka 如此流行？ | 我的技术博客" />
+<meta name="application-name" content="系统设计：为什么 Kafka 如此流行？ | 我的技术博客" />
+<meta property="og:site_name" content="" />
+
+<meta name="description" content="深入解析 Apache Kafka 的核心架构、应用场景及其在处理海量数据时的设计权衡">
+<meta itemprop="description" content="深入解析 Apache Kafka 的核心架构、应用场景及其在处理海量数据时的设计权衡" />
+<meta property="og:description" content="深入解析 Apache Kafka 的核心架构、应用场景及其在处理海量数据时的设计权衡" />
+<meta name="twitter:description" content="深入解析 Apache Kafka 的核心架构、应用场景及其在处理海量数据时的设计权衡" />
+
+<meta property="og:locale" content="zh" />
+<meta name="language" content="zh" />
+
+  <link rel="alternate" hreflang="zh" href="http://localhost:1313/posts/2026-02-15-kafka-system-design/" title="中文" />
+
+
+
+
+
+    
+    
+    
+
+    <meta property="og:type" content="article" />
+    <meta property="og:article:published_time" content=2026-02-15T10:00:00&#43;0800 />
+    <meta property="article:published_time" content=2026-02-15T10:00:00&#43;0800 />
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-15-kafka-system-design/" />
+
+    
+    <meta property="og:article:author" content="Kaka" />
+    <meta property="article:author" content="Kaka" />
+    <meta name="author" content="Kaka" />
+    
+    
+
+    
+
+    <script defer type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": "系统设计：为什么 Kafka 如此流行？",
+        "author": {
+        "@type": "Person",
+        "name": ""
+        },
+        "datePublished": "2026-02-15",
+        "description": "深入解析 Apache Kafka 的核心架构、应用场景及其在处理海量数据时的设计权衡",
+        "wordCount":  3367 ,
+        "mainEntityOfPage": "True",
+        "dateModified": "2026-02-15",
+        "image": {
+        "@type": "imageObject",
+        "url": ""
+        },
+        "publisher": {
+        "@type": "Organization",
+        "name": "我的技术博客"
+        }
+    }
+    </script>
+
+
+<meta name="generator" content="Hugo 0.154.3">
+
+    
+    <meta property="og:url" content="http://localhost:1313/posts/2026-02-15-kafka-system-design/">
+  <meta property="og:site_name" content="我的技术博客">
+  <meta property="og:title" content="系统设计：为什么 Kafka 如此流行？">
+  <meta property="og:description" content="深入解析 Apache Kafka 的核心架构、应用场景及其在处理海量数据时的设计权衡">
+  <meta property="og:locale" content="zh">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-15T10:00:00+08:00">
+    <meta property="article:modified_time" content="2026-02-15T10:00:00+08:00">
+    <meta property="article:tag" content="Kafka">
+    <meta property="article:tag" content="Distributed-Systems">
+    <meta property="article:tag" content="Message-Queue">
+    <meta property="article:tag" content="Streaming">
+
+
+    
+    
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="系统设计：为什么 Kafka 如此流行？">
+  <meta name="twitter:description" content="深入解析 Apache Kafka 的核心架构、应用场景及其在处理海量数据时的设计权衡">
+
+
+    
+
+    <link rel="canonical" href="http://localhost:1313/posts/2026-02-15-kafka-system-design/">
+    <link href="/style.min.e390ba7da26222f4dc42a349955d76dbbe44e5ce2535a43de5a70633a0a9ec3c.css" rel="stylesheet">
+    <link href="/code-highlight.min.706d31975fec544a864cb7f0d847a73ea55ca1df91bf495fd12a177138d807cf.css" rel="stylesheet">
+
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<link rel="manifest" href="http://localhost:1313/site.webmanifest">
+
+<meta name="msapplication-config" content="/browserconfig.xml">
+<meta name="msapplication-TileColor" content="#2d89ef">
+<meta name="theme-color" content="#434648">
+    <meta name="color-scheme" content="light dark">
+
+    
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+
+    
+    
+</head>
+<body data-theme = "" class="notransition">
+
+<script src="/js/theme.js"></script>
+
+<div class="navbar" role="navigation">
+    <nav class="menu" aria-label="Main Navigation">
+        <a href="http://localhost:1313/" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" 
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round" class="feather feather-home">
+<title></title>
+<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+<polyline points="9 22 9 12 15 12 15 22"></polyline>
+</svg>
+        </a>
+        <input type="checkbox" id="menu-trigger" class="menu-trigger" />
+        <label for="menu-trigger">
+            <span class="menu-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" stroke="currentColor" fill="none" viewBox="0 0 14 14"><title>Menu</title><path stroke-linecap="round" stroke-linejoin="round" d="M10.595 7L3.40726 7"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 3.51488L3.49301 3.51488"></path><path stroke-linecap="round" stroke-linejoin="round" d="M10.5096 10.4851H3.49301"></path><path stroke-linecap="round" stroke-linejoin="round" d="M0.5 12.5V1.5C0.5 0.947715 0.947715 0.5 1.5 0.5H12.5C13.0523 0.5 13.5 0.947715 13.5 1.5V12.5C13.5 13.0523 13.0523 13.5 12.5 13.5H1.5C0.947715 13.5 0.5 13.0523 0.5 12.5Z"></path></svg>
+            </span>
+        </label>
+
+        <div class="trigger">
+            <ul class="trigger-container">
+                
+                
+                <li>
+                    <a class="menu-link " href="/">
+                        首页
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/posts/">
+                        文章
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/tags/">
+                        标签
+                    </a>
+                    
+                </li>
+                
+                <li>
+                    <a class="menu-link " href="/about/">
+                        关于
+                    </a>
+                    
+                </li>
+                
+                <li class="menu-separator">
+                    <span>|</span>
+                </li>
+                
+                
+            </ul>
+            <a id="mode" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-sunny" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>LIGHT</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mode-moon" width="21" height="21" viewBox="0 0 14 14" stroke-width="1">
+<title>DARK</title><g><circle cx="7" cy="7" r="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></circle><line x1="7" y1="0.5" x2="7" y2="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="2.4" x2="3.82" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="0.5" y1="7" x2="2.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="2.4" y1="11.6" x2="3.82" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="7" y1="13.5" x2="7" y2="11.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="11.6" x2="10.18" y2="10.18" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="13.5" y1="7" x2="11.5" y2="7" fill="none" stroke-linecap="round" stroke-linejoin="round"></line><line x1="11.6" y1="2.4" x2="10.18" y2="3.82" fill="none" stroke-linecap="round" stroke-linejoin="round"></line></g></svg>
+            </a>
+        </div>
+    </nav>
+</div>
+
+<div class="wrapper post">
+    <main class="page-content" aria-label="Content">
+        <article>
+            <header class="header">
+                <h1 class="header-title">系统设计：为什么 Kafka 如此流行？</h1>
+                
+                
+                
+                <div class="post-meta">
+                    <time datetime="2026-02-15T10:00:00&#43;08:00" itemprop="datePublished"> 2026年2月15日 </time>
+                </div>
+                
+            </header>
+            
+    
+    <details class="toc" ZgotmplZ>
+        <summary><b></b></summary>
+        <nav id="TableOfContents">
+  <ul>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#为什么需要-kafka">为什么需要 Kafka？</a>
+      <ul>
+        <li><a href="#核心价值">核心价值</a></li>
+      </ul>
+    </li>
+    <li><a href="#kafka-核心架构">Kafka 核心架构</a>
+      <ul>
+        <li><a href="#基础概念">基础概念</a></li>
+        <li><a href="#消息分区策略">消息分区策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#生产者与消费者">生产者与消费者</a>
+      <ul>
+        <li><a href="#生产者producer">生产者（Producer）</a></li>
+        <li><a href="#消费者consumer">消费者（Consumer）</a></li>
+        <li><a href="#消息交付保证">消息交付保证</a></li>
+      </ul>
+    </li>
+    <li><a href="#高可用与容错">高可用与容错</a>
+      <ul>
+        <li><a href="#副本机制replication">副本机制（Replication）</a></li>
+      </ul>
+    </li>
+    <li><a href="#实际应用场景">实际应用场景</a>
+      <ul>
+        <li><a href="#场景-1实时数据流处理">场景 1：实时数据流处理</a></li>
+        <li><a href="#场景-2event-sourcing事件溯源">场景 2：Event Sourcing（事件溯源）</a></li>
+        <li><a href="#场景-3日志聚合">场景 3：日志聚合</a></li>
+      </ul>
+    </li>
+    <li><a href="#设计权衡与限制">设计权衡与限制</a>
+      <ul>
+        <li><a href="#高吞吐-vs-低延迟">高吞吐 vs 低延迟</a></li>
+        <li><a href="#顺序性保证">顺序性保证</a></li>
+        <li><a href="#运维复杂度">运维复杂度</a></li>
+      </ul>
+    </li>
+    <li><a href="#运维最佳实践">运维最佳实践</a>
+      <ul>
+        <li><a href="#监控指标">监控指标</a></li>
+        <li><a href="#容量规划公式">容量规划公式</a></li>
+        <li><a href="#分区数量建议">分区数量建议</a></li>
+        <li><a href="#消息保留策略">消息保留策略</a></li>
+        <li><a href="#故障处理流程">故障处理流程</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结</a></li>
+    <li><a href="#参考资源">参考资源</a></li>
+  </ul>
+</nav>
+    </details>
+            <div class="page-content">
+                <p><img src="https://img.kakacn.com/file/1771165068791_kafka.jpg" alt="kafka.jpg"></p>
+<h2 id="引言">引言</h2>
+<p>Apache Kafka 已经成为现代分布式系统中不可或缺的组件。LinkedIn、Netflix、Uber 等公司每天使用 Kafka 处理数十亿条消息。作为运维人员，深入理解 Kafka 的架构和工作原理对于系统的稳定运行至关重要。</p>
+<p>本文将详细介绍 Kafka 的核心概念、架构设计以及在生产环境中需要注意的权衡取舍。</p>
+<h2 id="为什么需要-kafka">为什么需要 Kafka？</h2>
+<h3 id="核心价值">核心价值</h3>
+<p>Kafka 解决了分布式系统中的三大核心问题：</p>
+<p><strong>1. 系统解耦</strong></p>
+<p>在传统架构中，生产者和消费者需要直接通信，这会导致系统间的紧密耦合。Kafka 作为中间层，允许生产者和消费者独立演进，互不影响。</p>
+<pre tabindex="0"><code>传统模式：
+服务A → 直接调用 → 服务B (紧耦合)
+
+Kafka模式：
+服务A → Kafka → 服务B (解耦)
+</code></pre><p><strong>2. 流量削峰</strong></p>
+<p>在流量高峰期，直接调用可能会压垮下游服务。Kafka 作为缓冲区，可以平滑处理突发流量。</p>
+<p>实际案例：电商大促期间，订单服务可能在瞬间接收数万笔订单，Kafka 可以暂存这些消息，让下游服务按照自己的处理能力逐步消费。</p>
+<p><strong>3. 事件回放</strong></p>
+<p>Kafka 保留历史消息，支持事件回放。这在以下场景中非常有用：</p>
+<ul>
+<li><strong>调试</strong>：重放生产环境的事件流来复现问题</li>
+<li><strong>故障恢复</strong>：系统恢复后重新处理丢失的数据</li>
+<li><strong>审计</strong>：追溯历史事件用于合规审计</li>
+<li><strong>Event Sourcing</strong>：基于事件重建系统状态</li>
+</ul>
+<h2 id="kafka-核心架构">Kafka 核心架构</h2>
+<h3 id="基础概念">基础概念</h3>
+<p>理解 Kafka 需要掌握以下核心概念：</p>
+<p><strong>消息（Message）</strong></p>
+<p>Kafka 中的基本数据单元，包含：</p>
+<ul>
+<li><strong>Key</strong>：消息键，用于分区路由</li>
+<li><strong>Value</strong>：消息内容（实际数据）</li>
+<li><strong>Timestamp</strong>：时间戳</li>
+<li><strong>Headers</strong>：元数据标头</li>
+</ul>
+<p><strong>主题（Topic）</strong></p>
+<p>消息的逻辑分类，类似于数据库中的表。例如：</p>
+<ul>
+<li><code>payment-events</code>：支付相关事件</li>
+<li><code>user-clicks</code>：用户点击行为</li>
+<li><code>order-updates</code>：订单状态更新</li>
+</ul>
+<p><strong>分区（Partition）</strong></p>
+<p>每个 Topic 可以分为多个 Partition，这是 Kafka 实现高吞吐的关键：</p>
+<pre tabindex="0"><code>Topic: order-events
+├── Partition 0: [msg1, msg2, msg3, ...]
+├── Partition 1: [msg4, msg5, msg6, ...]
+└── Partition 2: [msg7, msg8, msg9, ...]
+</code></pre><p>分区特性：</p>
+<ul>
+<li>每个分区是一个有序的、不可变的消息序列</li>
+<li>消息在分区内追加写入（Append-only Log）</li>
+<li>不同分区之间的消息顺序无法保证</li>
+</ul>
+<p><strong>Broker</strong></p>
+<p>Kafka 服务器节点，负责存储和处理消息。多个 Broker 组成一个 Kafka 集群。</p>
+<h3 id="消息分区策略">消息分区策略</h3>
+<p>分区策略决定了消息如何分布到不同的 Partition，这直接影响系统性能。</p>
+<p><strong>基于 Key 的分区</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 伪代码示例</span>
+</span></span><span style="display:flex;"><span>partition <span style="color:#f92672">=</span> hash(message<span style="color:#f92672">.</span>key) <span style="color:#f92672">%</span> num_partitions
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>相同 Key 的消息总是进入同一个分区，保证了顺序性。</p>
+<p><strong>热点分区问题（Hot Partition）</strong></p>
+<p>错误示例：视频评论系统，如果仅按视频 ID 分区：</p>
+<pre tabindex="0"><code>热门视频（movie_id=123）：
+Partition 1: ████████████████████ (过载！)
+
+冷门视频：
+Partition 2: ██
+Partition 3: █
+</code></pre><p>这会导致某个分区压力过大，其他分区闲置。</p>
+<p><strong>解决方案：复合键</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用复合键分散负载</span>
+</span></span><span style="display:flex;"><span>composite_key <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>movie_id<span style="color:#e6db74">}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{</span>user_id<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>partition <span style="color:#f92672">=</span> hash(composite_key) <span style="color:#f92672">%</span> num_partitions
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样即使是热门视频，不同用户的评论也会分散到不同分区。</p>
+<h2 id="生产者与消费者">生产者与消费者</h2>
+<h3 id="生产者producer">生产者（Producer）</h3>
+<p>生产者负责将消息发送到 Kafka。关键配置：</p>
+<p><strong>acks 参数</strong>（确认机制）</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#75715e"># 不等待确认（最快，可能丢数据）</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">acks</span><span style="color:#f92672">=</span><span style="color:#e6db74">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 等待 Leader 确认（平衡）</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">acks</span><span style="color:#f92672">=</span><span style="color:#e6db74">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 等待所有副本确认（最安全，最慢）</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">acks</span><span style="color:#f92672">=</span><span style="color:#e6db74">all</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="消费者consumer">消费者（Consumer）</h3>
+<p>消费者从 Kafka 读取消息。核心概念：</p>
+<p><strong>Offset（偏移量）</strong></p>
+<p>Offset 是消息在分区中的位置标识：</p>
+<pre tabindex="0"><code>Partition 0:
+Offset:  0    1    2    3    4    5
+Message: [A] [B] [C] [D] [E] [F]
+                      ↑
+              Consumer offset = 3
+</code></pre><p>消费者通过 Offset 跟踪处理进度：</p>
+<ol>
+<li>读取消息</li>
+<li>处理业务逻辑</li>
+<li>提交 Offset</li>
+</ol>
+<p>如果消费者崩溃重启，可以从上次提交的 Offset 继续消费。</p>
+<p><strong>消费者组（Consumer Group）</strong></p>
+<p>多个消费者可以组成一个消费者组，协作消费同一个 Topic：</p>
+<pre tabindex="0"><code>Topic: order-events (3 个分区)
+
+Consumer Group: order-processors
+├── Consumer 1 → Partition 0
+├── Consumer 2 → Partition 1
+└── Consumer 3 → Partition 2
+</code></pre><p>特性：</p>
+<ul>
+<li>组内每个分区只被一个消费者消费</li>
+<li>不同组的消费者可以独立消费同一个 Topic</li>
+<li>消费者数量不应超过分区数量</li>
+</ul>
+<h3 id="消息交付保证">消息交付保证</h3>
+<p>Kafka 提供三种交付语义：</p>
+<p><strong>1. At Most Once（最多一次）</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>message <span style="color:#f92672">=</span> consumer<span style="color:#f92672">.</span>poll()
+</span></span><span style="display:flex;"><span>consumer<span style="color:#f92672">.</span>commit_offset()  <span style="color:#75715e"># 先提交</span>
+</span></span><span style="display:flex;"><span>process(message)          <span style="color:#75715e"># 后处理</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>特点</strong>：快速，性能高</li>
+<li><strong>风险</strong>：如果处理失败，消息丢失</li>
+<li><strong>适用场景</strong>：日志收集、监控指标</li>
+</ul>
+<p><strong>2. At Least Once（至少一次）</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>message <span style="color:#f92672">=</span> consumer<span style="color:#f92672">.</span>poll()
+</span></span><span style="display:flex;"><span>process(message)          <span style="color:#75715e"># 先处理</span>
+</span></span><span style="display:flex;"><span>consumer<span style="color:#f92672">.</span>commit_offset()  <span style="color:#75715e"># 后提交</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>特点</strong>：不会丢消息</li>
+<li><strong>风险</strong>：如果提交失败，可能重复处理</li>
+<li><strong>适用场景</strong>：大多数业务场景</li>
+<li><strong>要求</strong>：下游系统需要实现幂等性</li>
+</ul>
+<p><strong>3. Exactly Once（精确一次）</strong></p>
+<p>使用 Kafka 事务机制实现：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>producer<span style="color:#f92672">.</span>begin_transaction()
+</span></span><span style="display:flex;"><span>producer<span style="color:#f92672">.</span>send(message)
+</span></span><span style="display:flex;"><span>producer<span style="color:#f92672">.</span>send_offsets_to_transaction(offsets)
+</span></span><span style="display:flex;"><span>producer<span style="color:#f92672">.</span>commit_transaction()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>特点</strong>：最强一致性保证</li>
+<li><strong>成本</strong>：性能开销大，配置复杂</li>
+<li><strong>适用场景</strong>：金融交易、账务系统</li>
+</ul>
+<h2 id="高可用与容错">高可用与容错</h2>
+<h3 id="副本机制replication">副本机制（Replication）</h3>
+<p>Kafka 通过副本保证数据可靠性：</p>
+<pre tabindex="0"><code>Topic: payments, Partition 0
+
+Broker 1 (Leader):   [A, B, C, D, E] ← 处理读写
+Broker 2 (Follower): [A, B, C, D, E] ← 同步复制
+Broker 3 (Follower): [A, B, C, D, E] ← 同步复制
+</code></pre><p><strong>角色说明</strong></p>
+<ul>
+<li><strong>Leader</strong>：处理所有读写请求</li>
+<li><strong>Follower</strong>：被动复制 Leader 的数据</li>
+<li><strong>ISR（In-Sync Replica）</strong>：与 Leader 保持同步的副本集合</li>
+</ul>
+<p><strong>故障切换</strong></p>
+<p>当 Leader 宕机时：</p>
+<ol>
+<li>Kafka 从 ISR 中选举新的 Leader</li>
+<li>客户端自动切换到新 Leader</li>
+<li>旧 Leader 恢复后成为 Follower</li>
+</ol>
+<p><strong>生产环境建议</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#75715e"># 副本因子（建议 3）</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">replication.factor</span><span style="color:#f92672">=</span><span style="color:#e6db74">3</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 最小同步副本数（建议 2）</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">min.insync.replicas</span><span style="color:#f92672">=</span><span style="color:#e6db74">2</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这样配置可以容忍 1 个 Broker 故障而不丢数据。</p>
+<h2 id="实际应用场景">实际应用场景</h2>
+<h3 id="场景-1实时数据流处理">场景 1：实时数据流处理</h3>
+<p><strong>Uber 动态定价系统</strong></p>
+<pre tabindex="0"><code>司机位置更新 → Kafka → 实时计算引擎 → 动态定价
+用户打车请求 → Kafka → 供需分析 → 价格调整
+</code></pre><p>Kafka 每秒处理数百万条位置更新，支持实时的供需平衡计算。</p>
+<h3 id="场景-2event-sourcing事件溯源">场景 2：Event Sourcing（事件溯源）</h3>
+<p>将系统状态变更记录为事件序列：</p>
+<pre tabindex="0"><code>订单系统事件流：
+1. OrderCreated (订单创建)
+2. PaymentReceived (支付完成)
+3. OrderShipped (订单发货)
+4. OrderDelivered (订单送达)
+</code></pre><p>通过回放事件流，可以重建任意时刻的系统状态。</p>
+<h3 id="场景-3日志聚合">场景 3：日志聚合</h3>
+<p>集中收集各个服务的日志：</p>
+<pre tabindex="0"><code>服务A → Kafka Topic: app-logs
+服务B → Kafka Topic: app-logs
+服务C → Kafka Topic: app-logs
+              ↓
+        日志分析系统
+      (ELK/Splunk)
+</code></pre><h2 id="设计权衡与限制">设计权衡与限制</h2>
+<h3 id="高吞吐-vs-低延迟">高吞吐 vs 低延迟</h3>
+<p>Kafka 优化的是<strong>吞吐量</strong>而非<strong>延迟</strong>：</p>
+<ul>
+<li><strong>吞吐量</strong>：可达每秒百万级消息</li>
+<li><strong>延迟</strong>：通常在几毫秒到几十毫秒</li>
+</ul>
+<p><strong>不适用场景</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># ❌ 不适合：同步 RPC 调用</span>
+</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> kafka<span style="color:#f92672">.</span>request_reply(message)  <span style="color:#75715e"># Kafka 不是这样用的</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ✓ 适合：异步事件处理</span>
+</span></span><span style="display:flex;"><span>kafka<span style="color:#f92672">.</span>send(event)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ... 稍后在消费者中处理</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于需要即时响应的场景（如用户登录验证），应该使用 RPC 框架（gRPC、HTTP）而非 Kafka。</p>
+<h3 id="顺序性保证">顺序性保证</h3>
+<p>Kafka 的顺序性有限制：</p>
+<pre tabindex="0"><code>✓ 保证：单个分区内的消息顺序
+✗ 不保证：跨分区的全局顺序
+</code></pre><p><strong>示例</strong></p>
+<pre tabindex="0"><code>Partition 0: [A1, A2, A3]  时间顺序
+Partition 1: [B1, B2, B3]  时间顺序
+
+跨分区消费时可能得到：
+[A1, B1, A2, B2, A3, B3]  顺序可能打乱
+</code></pre><p><strong>解决方案</strong></p>
+<p>如果需要全局顺序，只能使用单个分区（会限制吞吐量）。</p>
+<h3 id="运维复杂度">运维复杂度</h3>
+<p>引入 Kafka 会增加系统复杂度：</p>
+<p><strong>需要关注的运维点</strong></p>
+<ol>
+<li>
+<p><strong>集群监控</strong></p>
+<ul>
+<li>Broker 健康状态</li>
+<li>分区 Leader 分布</li>
+<li>副本同步延迟</li>
+<li>磁盘使用率</li>
+</ul>
+</li>
+<li>
+<p><strong>性能调优</strong></p>
+<ul>
+<li>分区数量规划</li>
+<li>副本因子设置</li>
+<li>消费者组平衡</li>
+<li>日志清理策略</li>
+</ul>
+</li>
+<li>
+<p><strong>容量规划</strong></p>
+<ul>
+<li>消息保留时间</li>
+<li>磁盘空间预估</li>
+<li>网络带宽需求</li>
+</ul>
+</li>
+</ol>
+<h2 id="运维最佳实践">运维最佳实践</h2>
+<h3 id="监控指标">监控指标</h3>
+<p>关键指标及告警阈值：</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#75715e"># Broker 指标</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">UnderReplicatedPartitions</span>: <span style="color:#ae81ff">&gt; 0 (告警)</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">OfflinePartitionsCount</span>: <span style="color:#ae81ff">&gt; 0 (告警)</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">ActiveControllerCount</span>: !<span style="color:#ae81ff">= 1 (告警)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 生产者指标</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">RecordSendRate</span>: <span style="color:#ae81ff">监控趋势</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">RecordErrorRate</span>: <span style="color:#ae81ff">&gt; 0.1% (告警)</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">RequestLatencyAvg</span>: <span style="color:#ae81ff">&gt; 100ms (关注)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 消费者指标</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">ConsumerLag</span>: <span style="color:#ae81ff">&gt; 10000 (告警)</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">RecordsConsumedRate</span>: <span style="color:#ae81ff">监控趋势</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="容量规划公式">容量规划公式</h3>
+<p><strong>磁盘容量估算</strong></p>
+<pre tabindex="0"><code>所需磁盘 = (消息速率 × 消息大小 × 保留时间 × 副本因子) / 压缩率
+
+示例：
+- 消息速率：10,000 msg/s
+- 消息大小：1KB
+- 保留时间：7天
+- 副本因子：3
+- 压缩率：0.5
+
+所需磁盘 = 10000 × 1KB × 7×24×3600 × 3 / 0.5
+         ≈ 3.6 TB
+</code></pre><h3 id="分区数量建议">分区数量建议</h3>
+<pre tabindex="0"><code>分区数 = max(
+    目标吞吐量 / 单分区吞吐量,
+    消费者数量
+)
+
+# 示例
+目标：100 MB/s
+单分区：10 MB/s
+分区数 ≥ 10
+</code></pre><p>注意：分区数不是越多越好，过多分区会增加：</p>
+<ul>
+<li>文件描述符消耗</li>
+<li>选举时间</li>
+<li>端到端延迟</li>
+</ul>
+<h3 id="消息保留策略">消息保留策略</h3>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#75715e"># 基于时间</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">log.retention.hours</span><span style="color:#f92672">=</span><span style="color:#e6db74">168  # 保留7天</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 基于大小</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">log.retention.bytes</span><span style="color:#f92672">=</span><span style="color:#e6db74">1073741824  # 保留1GB</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 压缩策略（用于状态快照）</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">log.cleanup.policy</span><span style="color:#f92672">=</span><span style="color:#e6db74">compact</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="故障处理流程">故障处理流程</h3>
+<p><strong>Broker 宕机</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. 检查集群状态</span>
+</span></span><span style="display:flex;"><span>kafka-broker-api-versions.sh --bootstrap-server localhost:9092
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 查看 Under-replicated 分区</span>
+</span></span><span style="display:flex;"><span>kafka-topics.sh --describe --under-replicated-partitions <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --bootstrap-server localhost:9092
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 触发 Leader 重新选举（如需要）</span>
+</span></span><span style="display:flex;"><span>kafka-leader-election.sh --bootstrap-server localhost:9092 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --topic &lt;topic-name&gt; --partition &lt;partition-id&gt; --election-type preferred
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 重启故障 Broker</span>
+</span></span><span style="display:flex;"><span>systemctl restart kafka
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>消费者 Lag 过高</strong></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. 检查消费者组状态</span>
+</span></span><span style="display:flex;"><span>kafka-consumer-groups.sh --bootstrap-server localhost:9092 <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  --describe --group &lt;group-id&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 可能的解决方案：</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 增加消费者实例</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 优化消费逻辑性能</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 增加分区数（需要重新分配）</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># - 临时调整 max.poll.records 减少单次处理量</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="总结">总结</h2>
+<p>Kafka 作为现代分布式系统的核心组件，提供了强大的系统解耦、流量削峰和事件回放能力。但在使用时需要注意：</p>
+<p><strong>适用场景</strong></p>
+<ul>
+<li>需要高吞吐量的数据流处理</li>
+<li>系统间异步解耦</li>
+<li>事件溯源和 CQRS 架构</li>
+<li>日志聚合和实时分析</li>
+</ul>
+<p><strong>不适用场景</strong></p>
+<ul>
+<li>需要即时响应的同步调用</li>
+<li>需要严格全局顺序的场景</li>
+<li>简单的点对点消息传递（可能有更轻量的选择）</li>
+</ul>
+<p><strong>运维关键点</strong></p>
+<ul>
+<li>合理规划分区数量和副本因子</li>
+<li>持续监控关键指标（Lag、副本同步状态）</li>
+<li>定期评估容量和性能</li>
+<li>建立完善的故障处理流程</li>
+</ul>
+<p>理解这些核心概念和权衡，才能在生产环境中充分发挥 Kafka 的价值，同时避免常见的陷阱。</p>
+<h2 id="参考资源">参考资源</h2>
+<ul>
+<li><a href="https://kafka.apache.org/documentation/">Kafka 官方文档</a></li>
+<li><a href="https://docs.confluent.io/platform/current/kafka/deployment.html">Confluent 最佳实践</a></li>
+<li><a href="https://kafka.apache.org/documentation/#monitoring">Kafka 监控指南</a></li>
+</ul>
+<hr>
+<p><em>本文基于 Kafka 3.x 版本编写，适用于运维人员快速理解 Kafka 的核心概念和生产实践。</em></p>
+
+            </div>
+        </article></main>
+</div>
+<footer class="footer">
+    <span class="footer_item"> </span>
+    &nbsp;
+
+    <div class="footer_social-icons">
+<a href="https://github.com/kaka-milan-22" target="_blank" rel="noopener noreferrer me"
+    title="Github">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+    </path>
+</svg>
+</a>
+<a href="https://x.com/kaka99859362" target="_blank" rel="noopener noreferrer me"
+    title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path
+        d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
+    </path>
+</svg>
+</a>
+<a href="mailto:kaka@kakacn.com" target="_blank" rel="noopener noreferrer me"
+    title="Email">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 21" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+    <polyline points="22,6 12,13 2,6"></polyline>
+</svg>
+</a>
+</div>
+    <small class="footer_copyright">
+        © 2026 Kaka.
+        
+    </small>
+</footer>
+
+
+
+
+
+
+
+    
+    <script async src="http://localhost:1313/js/main.js" ></script>
+
+    
+
+</body>
+</html>

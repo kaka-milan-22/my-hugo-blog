@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>锁 on 我的技术博客</title>
+    <link>http://localhost:1313/tags/%E9%94%81/</link>
+    <description>Recent content in 锁 on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sat, 14 Feb 2026 12:30:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/tags/%E9%94%81/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>数据库锁与MVCC：从入门到精通的完整逻辑链</title>
+      <link>http://localhost:1313/posts/2026-01-13-database-locks-mvcc/</link>
+      <pubDate>Sat, 14 Feb 2026 12:30:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-01-13-database-locks-mvcc/</guid>
+      
+      <description>&lt;h2 id=&#34;开场一个让人抓狂的bug&#34;&gt;开场：一个让人抓狂的BUG&lt;/h2&gt;
+&lt;p&gt;2016年，我刚做运维的时候，遇到了一个诡异的问题。&lt;/p&gt;
+&lt;p&gt;某个下单接口，压测的时候发现：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;单用户测试：响应时间50ms，一切正常 ✅&lt;/li&gt;
+&lt;li&gt;100并发测试：响应时间5000ms，慢了100倍 ❌&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;后端开发说：&amp;ldquo;我的代码没问题啊，为什么并发就这么慢？&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;我看了看监控，CPU不高，内存不高，磁盘IO也不高。那问题在哪？&lt;/p&gt;
+&lt;p&gt;直到我打开MySQL的慢查询日志，看到了一堆&lt;code&gt;Waiting for table lock&lt;/code&gt;&amp;hellip;&lt;/p&gt;
+&lt;p&gt;原来，100个请求在&lt;strong&gt;排队等锁&lt;/strong&gt;。就像100个人在一个单人厕所门口排队，当然慢。&lt;/p&gt;
+&lt;p&gt;那天，我第一次意识到：&lt;strong&gt;数据库的锁，是性能杀手，也是数据安全的保护神。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;今天，让我用最简单的逻辑，给你讲清楚数据库的锁和MVCC。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

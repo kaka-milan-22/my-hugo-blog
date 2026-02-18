@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Container on 我的技术博客</title>
+    <link>http://localhost:1313/categories/container/</link>
+    <description>Recent content in Container on 我的技术博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh</language>
+    <lastBuildDate>Sun, 15 Feb 2026 11:00:00 +0800</lastBuildDate><atom:link href="http://localhost:1313/categories/container/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes 深度解析：为什么它成为容器编排的事实标准？</title>
+      <link>http://localhost:1313/posts/2026-02-15-kubernetes-deep-dive/</link>
+      <pubDate>Sun, 15 Feb 2026 11:00:00 +0800</pubDate>
+      
+      <guid>http://localhost:1313/posts/2026-02-15-kubernetes-deep-dive/</guid>
+      
+      <description>&lt;p&gt;&lt;img src=&#34;https://img.kakacn.com/file/1771166552159_k8s_blog_800w.jpg&#34; alt=&#34;k8s_blog_800w.jpg&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;引言&#34;&gt;引言&lt;/h2&gt;
+&lt;p&gt;在云原生时代，Kubernetes（简称 K8s）已经成为容器编排领域的事实标准。从初创公司到 Google、Netflix 等科技巨头，无数组织都在使用 K8s 管理他们的容器化应用。作为运维工程师，深入理解 K8s 的架构和运作机制，已经成为必备技能。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>
