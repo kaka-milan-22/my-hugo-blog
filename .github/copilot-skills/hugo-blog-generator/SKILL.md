@@ -9,8 +9,8 @@ description: Professional technical blog article generator for Hugo static site.
 
 ## 项目信息
 
-- **博客路径**: `/Users/ios1/my-hugo-blog`
-- **文章目录**: `/Users/ios1/my-hugo-blog/content/posts`
+- **博客路径**: `/Users/kaka/claude/my-hugo-blog`
+- **文章目录**: `/Users/kaka/claude/my-hugo-blog/content/posts`
 - **博客主题**: 运维、DevOps、云原生、Linux、架构
 - **作者**: Kaka
 - **语言**: 中文为主
@@ -98,8 +98,8 @@ description: "文章简短描述，一般1-2句话概括核心内容"
    - 撰写引言部分
    - 编写主体内容（章节、代码、示例）
    - 添加总结
-4. **保存文件**: 保存到 `/Users/ios1/my-hugo-blog/content/posts/` 目录
-5. **备份到 Obsidian**: 将生成的 md 文件复制到 `/Users/ios1/OBsidian/`
+4. **保存文件**: 保存到 `/Users/kaka/claude/my-hugo-blog/content/posts/` 目录
+5. **备份到 Obsidian**: 将生成的 md 文件复制到 `/Users/kaka/obnotes/`
 6. **自动提交**: 生成文章后自动执行 git commit 和 push
 7. **确认**: 告知用户文件已创建、备份到 Obsidian、提交并推送到 GitHub
 
@@ -125,6 +125,6 @@ description: "文章简短描述，一般1-2句话概括核心内容"
 ## 示例参考
 
 参考已有文章的风格：
-- `/Users/ios1/my-hugo-blog/content/posts/2026-02-16-uv-python-game-changer.md`
-- `/Users/ios1/my-hugo-blog/content/posts/2026-02-15-kubernetes-deep-dive.md`
-- `/Users/ios1/my-hugo-blog/content/posts/2026-02-14-nginx-complete-guide.md`
+- `/Users/kaka/claude/my-hugo-blog/content/posts/2026-02-16-uv-python-game-changer.md`
+- `/Users/kaka/claude/my-hugo-blog/content/posts/2026-02-15-kubernetes-deep-dive.md`
+- `/Users/kaka/claude/my-hugo-blog/content/posts/2026-02-14-nginx-complete-guide.md`
