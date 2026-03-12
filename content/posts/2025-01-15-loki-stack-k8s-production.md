@@ -1,15 +1,11 @@
 ---
 title: "Loki Stack 生产实践：K8s 环境下日均 1T 日志的高可用架构"
 date: 2025-01-15T10:00:00+08:00
-lastmod: 2025-01-15T10:00:00+08:00
 draft: false
-tags: ["loki", "kubernetes", "observability", "logging", "devops", "grafana", "fluent-bit"]
-categories: ["可观测性", "运维架构"]
-author: "Platform Engineering"
+tags: ["Loki", "Kubernetes", "可观测性", "日志", "DevOps", "Grafana", "Fluent Bit"]
+categories: ["DevOps", "云原生"]
+author: "Kaka"
 description: "深入剖析 Loki Stack 在 Kubernetes 生产环境中的落地实践，涵盖 Ingester Ring 原理、横向扩展策略、Fluent Bit 采集配置与日均 1TB 日志场景的完整方案。"
-summary: "从命名由来出发，系统介绍 Loki Stack 的核心优势，深入讲解 Ingester Ring 一致性哈希机制与副本写入原理，以 K8s 生产集群日均 1TB 日志收集为例，详细说明 Fluent Bit 替代 Promtail 的原因与完整配置方案。"
-toc: true
-weight: 1
 ---
 
 ## 为什么叫 Loki Stack？
