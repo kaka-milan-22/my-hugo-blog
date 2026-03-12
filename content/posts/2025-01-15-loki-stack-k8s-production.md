@@ -1,6 +1,6 @@
 ---
 title: "Loki Stack 生产实践：K8s 环境下日均 1T 日志的高可用架构"
-date: 2025-01-15T10:00:00+08:00
+date: 2026-03-12T10:00:00+08:00
 draft: false
 tags: ["Loki", "Kubernetes", "可观测性", "日志", "DevOps", "Grafana", "Fluent Bit"]
 categories: ["DevOps", "云原生"]
