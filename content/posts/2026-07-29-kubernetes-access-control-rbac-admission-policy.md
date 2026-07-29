@@ -1,16 +1,18 @@
 ---
-title: "Kubernetes 权限体系全景：从 RBAC 到 Admission Policy"
+title: "Kubernetes 权限体系进阶：完整 Access Control 架构"
 date: 2026-07-29T10:00:00+08:00
 draft: false
 tags: ["Kubernetes", "RBAC", "Admission Control", "Security", "Zero Trust"]
 categories: ["云原生", "DevOps"]
 author: "Kaka"
-description: "系统拆解 Kubernetes 从身份认证、授权到准入控制的完整权限链路，解释 RBAC、Node、Webhook、Pod Security 与 Admission Policy 分别解决什么问题，以及生产环境如何组合。"
+description: "从架构视角串联 Kubernetes 身份认证、RBAC、Node 与 Webhook Authorization、Admission Policy、runtime isolation 和 Audit，给出生产环境的完整组合方案。"
 ---
 
 ## 引言
 
 谈 Kubernetes 权限，很多人第一反应是 RBAC。但 RBAC 只回答一个问题：**某个身份能否对某类 API 资源执行某个动作**。它不负责确认身份真假，也不能判断一个 Deployment 是否使用了特权容器、是否挂载了不该使用的 ServiceAccount，更不能限制读请求返回的对象字段。
+
+> 本文是 Kubernetes 权限系列第 4/4 篇，适合在掌握 RBAC、ServiceAccount 与 Admission 基础后阅读，重点是完整架构与生产组合。
 
 真正完整的 Kubernetes API 访问控制，是一条连续的决策链：
 
@@ -415,6 +417,13 @@ Kubernetes 权限设计的核心不是写出更多 Role，而是把不同问题�
 Authentication 建立可信身份；RBAC 负责大多数 user、group 与 ServiceAccount 的 API 权限；Node authorizer + NodeRestriction 专门约束 kubelet；Admission 根据对象内容补默认值并执行安全不变量；PSA 提供 Pod 安全基线；CEL Admission Policy 承担大多数声明式平台规则；Webhook 只处理需要外部上下文的复杂策略；Runtime controls 限制已经启动的 workload；Audit 提供持续验证与追责。
 
 最实用的生产原则可以压缩成一句话：**OIDC/ServiceAccount 定身份，namespaced RBAC 给最小 API 权限，PSA + CEL Policy 限制对象内容，Webhook 补外部判断，NetworkPolicy 和 runtime security 收紧运行面，Audit 验证整条链路。**
+
+## 系列文章
+
+1. [Kubernetes RBAC 基础与实战：四个对象讲清最小权限](/posts/2026-07-29-kubernetes-rbac-basics-practice/)
+2. [Kubernetes ServiceAccount 实战：Pod 身份、Token 与跨 Namespace 授权](/posts/2026-07-29-kubernetes-serviceaccount-practice/)
+3. [为什么 Kubernetes 只有 RBAC 不够：从隐式提权到 Admission Policy](/posts/2026-07-29-why-kubernetes-rbac-is-not-enough/)
+4. Kubernetes 权限体系进阶：完整 Access Control 架构（本文）
 
 ## 参考资料
 
