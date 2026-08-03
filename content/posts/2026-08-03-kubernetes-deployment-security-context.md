@@ -68,7 +68,67 @@ SecurityContext 描述一个工作负载打算怎样运行，但有权限修改 
 | 应用可调用过多 system calls | `seccompProfile.type: RuntimeDefault` | 使用 container runtime 的默认 seccomp profile 过滤高风险 system calls |
 | 非 root 进程无法写共享 volume | `fsGroup`、`fsGroupChangePolicy` | 为支持的 volume 设置 group ownership，让应用不必用 root 修权限 |
 
-这些控制是纵深防御关系，不是互相替代。例如，非 root 进程仍可能利用多余 capability；只读 root filesystem 也不会让挂载的 `emptyDir`、PVC 或 Secret 自动变成只读。每个权限面都要单独收紧。
+### 三项基础限制分别控制什么
+
+最常见的 hardening 组合如下。如果配置放在 `containers[].securityContext`，三个字段可以写在一起；本文完整实例把所有 container 都要继承的 `runAsNonRoot` 放到了 Pod-level，效果相同。
+
+```yaml
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+```
+
+`runAsNonRoot: true` 控制“进程是谁”。Kubelet 会确保 container 的入口进程不以 UID `0` 运行；如果 image 默认用户是 root，Pod 会启动失败，而不是静默降级。生产配置最好同时明确 numeric `runAsUser` 和 `runAsGroup`，这样行为不依赖 image 内的用户名及 `/etc/passwd`。
+
+`allowPrivilegeEscalation: false` 控制“进程以后能否获得更多权限”。它让 container process 启用 Linux `no_new_privs`：子进程通过 `execve` 启动 setuid、setgid 或带 file capability 的程序时，不能获得高于父进程的新权限。例如 Web application 被 RCE 后，即使攻击者找到一个 setuid binary，也不能借它从 UID `10001` 升级成 root。这个字段不会删除进程已经拥有的权限；当 container 使用 `privileged: true` 或拥有 `CAP_SYS_ADMIN` 时，也不能依赖它提供有效保护。
+
+`capabilities.drop: ["ALL"]` 控制“kernel 允许进程执行哪些特权操作”。Linux capabilities 把传统 root 的全能权限拆成一组独立权限位；Kubernetes 不保证 container 的默认 capability 集合，实际默认值由 container runtime 和 OCI 配置决定。`ALL` 要求 runtime 在进程启动前清空 capability set，需要特殊 capability 的 system call 随后会被 kernel 以 `EPERM` 拒绝。
+
+三者组合后的攻击路径就很直观：
+
+```text
+Application 出现 RCE
+        ↓
+攻击者拿到 UID 10001 的 shell       ← runAsNonRoot
+        ↓
+shell 没有额外 kernel privilege      ← capabilities.drop ALL
+        ↓
+执行 setuid/file-capability 程序也不能提权
+                                       ← allowPrivilegeEscalation: false
+```
+
+### `drop: ["ALL"]` 具体删除了什么
+
+Capabilities 并不是命令或程序，而是 kernel 在执行敏感操作时检查的权限位。常见 container runtime 可能提供的能力及其风险如下；具体默认集合可能因 runtime、版本与 process UID 而不同，因此不应把某个环境的默认值当成安全 contract。
+
+| Capability | 能做什么 | 删除后的效果 |
+|---|---|---|
+| `CAP_CHOWN` | 任意修改文件 UID/GID ownership | 不能随意 `chown` 不属于自己的文件 |
+| `CAP_DAC_OVERRIDE` | 绕过普通文件 `rwx` 权限检查 | 只能访问 UID、GID 和 mode 允许的文件 |
+| `CAP_FOWNER` | 绕过“必须是文件 owner”的权限检查 | 不能随意修改其他用户文件的属性 |
+| `CAP_SETUID`、`CAP_SETGID` | 切换进程 UID/GID 和 supplementary groups | 不能利用这些能力改变 process identity |
+| `CAP_NET_RAW` | 创建 raw socket，构造 ICMP/IP packet | raw packet crafting 会被拒绝 |
+| `CAP_NET_BIND_SERVICE` | 在需要该能力的环境中监听低于 `1024` 的端口 | 应优先监听 `8080` 等非特权端口 |
+| `CAP_KILL` | 向不同 UID 的进程发送 signal | 只能 signal 普通权限允许的目标进程 |
+| `CAP_MKNOD` | 创建 block/character device node | 不能创建新的 device node；device cgroup 仍是另一层限制 |
+| `CAP_SETFCAP` | 给文件写入 file capability | 不能为二进制预埋额外 capability |
+| `CAP_SYS_CHROOT` | 改变进程的 root directory | `chroot` 会被拒绝 |
+
+如果应用确实需要某项 capability，正确做法仍是先删除全部，再恢复经过验证的最小集合：
+
+```yaml
+capabilities:
+  drop: ["ALL"]
+  add: ["NET_BIND_SERVICE"]  # 仅在确实必须监听低端口时添加
+```
+
+Pod Security Standards 的 `restricted` profile 只允许加回 `NET_BIND_SERVICE`。多数 Web application 更适合在 container 内监听 `8080`，再通过 Service 将端口映射为 `80`，这样完全不需要增加 capability。
+
+这些控制是纵深防御关系，不是互相替代。`runAsNonRoot` 只约束 UID，不能证明 capability set 为空；`drop ALL` 也不会阻止普通 outbound TCP、读取当前 UID 有权访问的文件、访问已挂载 Secret 或执行普通 system calls。只读 root filesystem 同样不会让挂载的 `emptyDir`、PVC 或 Secret 自动变成只读，每个权限面都要单独收紧。
 
 SecurityContext 同样有明确边界：它不管理 east-west network traffic，不能替代 NetworkPolicy；不控制谁能修改 Deployment，不能替代 RBAC；不扫描 image vulnerability，也不能替代 image signing、SBOM 和 admission policy；更不能保护被应用主动读取并泄露的 Secret。它解决的是 Pod 内进程的 runtime identity、privilege 和 filesystem access control。
 
@@ -213,13 +273,13 @@ kubectl port-forward -n security-demo service/security-context-demo 8080:80
 curl http://127.0.0.1:8080/
 ```
 
-接下来直接检查运行时结果。`id` 应显示 UID/GID `10001`；`NoNewPrivs` 应为 `1`；`CapEff` 应为全零。写 container root filesystem 会失败，而单独挂载的 `/tmp` 可以写入：
+接下来直接检查运行时结果。`id` 应显示 UID/GID `10001`；`NoNewPrivs` 应为 `1`；`CapInh`、`CapPrm`、`CapEff`、`CapBnd` 和 `CapAmb` 是 Linux process 的不同 capability set，全部应为全零。写 container root filesystem 会失败，而单独挂载的 `/tmp` 可以写入：
 
 ```bash
 kubectl exec -n security-demo deploy/security-context-demo -- id
 
 kubectl exec -n security-demo deploy/security-context-demo -- \
-  sh -c 'grep -E "^(NoNewPrivs|CapEff):" /proc/1/status'
+  sh -c 'grep -E "^(NoNewPrivs|Cap(Inh|Prm|Eff|Bnd|Amb)):" /proc/1/status'
 
 kubectl exec -n security-demo deploy/security-context-demo -- \
   sh -c 'touch /should-fail'
@@ -229,12 +289,30 @@ kubectl exec -n security-demo deploy/security-context-demo -- \
   sh -c 'touch /tmp/allowed && ls -l /tmp/allowed'
 ```
 
-最后可以故意删除 `allowPrivilegeEscalation: false` 再执行 `kubectl apply`。Deployment object 的请求可能先收到 warning，但 `enforce` 最终作用于 controller 创建的 Pod，违规 Pod 会被拒绝，Deployment 因而无法完成 rollout。这也解释了为什么上线检查不能只看 `kubectl apply` 是否成功，还要检查 rollout status 和 ReplicaSet event。
+最后可以故意删除 `allowPrivilegeEscalation: false` 再执行 `kubectl apply`，观察 Pod Security Admission 的两个检查阶段。`kubectl apply` 提交的是 Deployment object，不是 Pod；API server 会对 Deployment template 执行 `warn` 检查，因此通常会先打印 `restricted` warning，但 `enforce` 不会在这个阶段拒绝 Deployment。
+
+Deployment 被保存后，Deployment controller 创建 ReplicaSet，ReplicaSet controller 再向 API server 请求创建真正的 Pod。此时 `enforce` 才检查 Pod；由于 `restricted` 要求显式设置 `allowPrivilegeEscalation: false`，Pod 请求会被拒绝。最终现象是 `kubectl apply` 看似成功，Deployment 和 ReplicaSet 也存在，但可用 Pod 始终创建不出来，rollout 一直失败：
+
+```text
+kubectl apply
+  → Deployment 创建成功，并可能显示 restricted warning
+  → Deployment controller 创建 ReplicaSet
+  → ReplicaSet controller 请求创建 Pod
+  → Pod Security Admission enforce 拒绝违规 Pod
+  → Deployment 无法达到期望副本数，rollout 失败
+```
+
+这就是为什么上线检查不能只看 `kubectl apply` 的退出状态，还必须检查 rollout status 和 ReplicaSet event：
 
 ```bash
+kubectl rollout status deployment/security-context-demo \
+  -n security-demo --timeout=60s
+
 kubectl describe replicaset -n security-demo \
   -l app=security-context-demo
 ```
+
+`kubectl describe` 的 event 中会出现类似 `FailedCreate: violates PodSecurity "restricted"` 的原因。修复配置并重新 apply 后，controller 才能创建符合策略的新 Pod。
 
 ## 常见兼容性问题
 
