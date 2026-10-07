@@ -32,7 +32,23 @@ description: "从最后一次国歌、朋友与队友的眼泪，到孩子怀里
 
 告别赛很奇怪。明明知道结果没有那么重要，反而比平时看得更仔细。以前希望开球快一点，希望中场休息短一点；今天，连进场前的等待都想多留一会儿。
 
-现场的告别开始得很早。球迷沿着球队前往球场的路线等待，唱歌，喊他的名字。车里的梅西已经流泪，De Paul 和 Otamendi 陪在身边。到了看台上，又能找到 Antonela、母亲 Celia、Agüero 和 Di María；1978、1986、2022 年的世界杯冠军成员，也有人来到这里送他。[现场报道记录了这些重逢](https://www.huffingtonpost.es/deporte/gracias-leo-argentina-despide-messi-lagrimas-ultimo-gol-pais-rendido-entregado-leyenda-f202610.html)。
+现场的告别开始得很早。球迷沿着球队前往球场的路线等待，唱歌，喊他的名字。有人带着旗帜，有人把想说的话写在纸上。镜头里的那张手写告别信，只是薄薄一页，却像替很多人说出了同一句话：谢谢你，队长，我们会非常想你。
+
+![告别赛当天，一位球迷举起写着感谢梅西与想念队长的手写信](/images/posts/2026-messi-argentina-farewell/16-fan-goodbye-letter.jpg)
+
+*2026 年 10 月 6 日，球迷举起写有「Messi, gracias por todo, capitán」的纸张。图片：Reuters，来源 [Claro Sports 的赛前现场报道](https://www.clarosports.com/futbol/locura-total-por-messi-argentina-despide-a-su-capitan-con-calles-repletas-y-lluvia-de-mensajes/)。*
+
+车里的梅西已经流泪，De Paul 和 Otamendi 陪在身边。球场还没到，告别却已经从车窗外涌进来。看着他低下头，把手抬到脸前，我才更清楚地意识到：今天舍不得的人，也包括他自己。
+
+![前往 Monumental 的大巴内，梅西低头掩面](/images/posts/2026-messi-argentina-farewell/17-messi-bus-tears.jpg)
+
+*去球场的路上，已经难掩情绪。图片：视频截图，来源 [El Tribuno 对大巴内这一幕的报道](https://www.eltribuno.com/deportes/2026-10-6-21-49-0-el-llanto-de-leo-messi-en-el-micro-rumbo-a-su-ultimo-partido-con-la-seleccion-argentina/amp)。*
+
+到了看台上，又能找到 Antonela、母亲 Celia、Agüero 和 Di María；1978、1986、2022 年的世界杯冠军成员，也有人来到这里送他。[现场报道记录了这些重逢](https://www.huffingtonpost.es/deporte/gracias-leo-argentina-despide-messi-lagrimas-ultimo-gol-pais-rendido-entregado-leyenda-f202610.html)。Antonela 和孩子们出现在包厢里，朝外挥手。家人的笑容和稍后球场上的眼泪，原来只隔着一场比赛。
+
+![Antonela 与孩子们在 Monumental 包厢向球迷挥手](/images/posts/2026-messi-argentina-farewell/18-family-in-stands.jpg)
+
+*告别赛当天，Antonela 和孩子们来到看台。摄影：Rodrigo Valle / Reuters；图片来源：[TN 现场图集](https://tn.com.ar/show/famosos/2026/10/06/de-antonela-roccuzzo-a-pablito-lescano-las-fotos-de-los-famosos-en-el-ultimo-partido-de-messi-en-la-seleccion/)。*
 
 有些人陪他拿过奖杯，有些人陪他输过决赛，有些人认识的还是那个没什么话、只知道带球往前跑的少年。看见这些名字重新聚在一起，二十一年一下子就有了分量。
 
@@ -104,7 +120,7 @@ Nico Paz 的名字则指向以后。梅西离开后，阿根廷还有比赛，�
 
 ## 那些来送他的朋友，带着我们认识的旧时光
 
-Agüero、Paredes、Di María 出现在这场告别里，意义远远超过“有几位球星到场”。还有远方的 Neymar，他们每个人带来的，都是梅西人生里别人无法代替的一段。
+Agüero、Paredes、Di María 出现在这场告别里，意义远远超过“有几位球星到场”。还有 Neymar 发来的祝福，以及写到这里就一定会想起的 Suárez。他们每个人带来的，都是梅西人生里别人无法代替的一段。
 
 ### Agüero：认识那个还没有赢得一切的你
 
@@ -170,7 +186,51 @@ Neymar 既知道接到梅西传球是什么感觉，也知道面对梅西是什�
 
 今天读他的文字，我又会想起 MSN。那些名字一出现，很多俱乐部的夜晚也一起回来了。原来国家队的一场告别，会牵动这么多记忆；我们以为自己在送蓝白 10 号，心里却连那个在 Barcelona 带球的年轻梅西也重新看了一遍。
 
-我愿意把这样的文字也放进今天的记忆。不是只有站在球场里的告别才算数。有人亲自来到看台，有人隔着距离写下祝福，还有更多人像我一样，在屏幕前看完，然后久久不想关掉。
+### Suárez：从把球传给你，到把日子过在一起
+
+![Barcelona 时期，梅西与身穿 9 号球衣的 Suárez 拥抱庆祝](/images/posts/2026-messi-argentina-farewell/19-suarez-messi.jpg)
+
+*Barcelona 时期的历史照片。9 号与 10 号的拥抱，早已不只属于某一次进球。图片来源：[FC Barcelona 在 Suárez 离队时发布的回顾](https://www.fcbarcelona.es/es/futbol/primer-equipo/noticias/1840458/suarez-me-voy-orgulloso-he-entrado-en-la-historia-del-club)。*
+
+写到 Neymar，怎么能不写 Luis Suárez。
+
+我记得的 Suárez，是那个在禁区里和后卫缠斗、替梅西扯开空间的人，也是梅西一抬头，就知道可以把球交过去的人。他们之间有很多配合，看起来只是一次跑位、一次顺势做球，可球真的传出来时，才发现两个人早已想到了一起。一个敢传，一个知道该往哪里跑。
+
+2014 年到 2020 年，他们在 Barcelona 做了六年队友。到 Suárez 离开的那一天，已经很难只用进球和冠军来描述这段关系。告别发布会上，Suárez 特意谈到梅西，说这些年 Leo 一直待他很好；也说他们早就在国家队交过手，今后成为对手，同样不会改变彼此的关系。[俱乐部留下的原话](https://www.fcbarcelona.es/es/futbol/primer-equipo/noticias/1840458/suarez-me-voy-orgulloso-he-entrado-en-la-historia-del-club)，今天读起来仍然让人心软。
+
+后来，Suárez 在 2024 年加入 Inter Miami，他们又穿上了同一件俱乐部球衣。[这次重聚的官宣](https://www.intermiamicf.com/news/inter-miami-cf-signs-iconic-striker-luis-suarez)里，也有 Busquets 和 Alba 的名字。看到这些人重新站在一起，我当然知道年龄不会倒退，但还是会高兴：有些曾经以为已经结束的配合，竟然还能再看一段。
+
+而他们的友谊，早就走到了球场外。Antonela 和 Suárez 的妻子 Sofía 也很亲近，两家人会一起度假、一起带着孩子出门。[2024 年留下的家庭出游照片](https://www.infobae.com/deportes/2024/08/20/las-fotos-del-paseo-en-yate-de-lionel-messi-y-antonela-roccuzzo-con-la-familia-de-luis-suarez-por-miami/)，记录的已经是比赛之外共同度过的日子。球迷记住他们替彼此送出的助攻，他们自己还记得很多没有比分的下午。
+
+想到这里，今天的告别才稍微有了一点安慰。国家队的下一次集结等不到梅西了，可他往后的人生里，仍然有这些认识他很多年、能够坐下来好好吃一顿饭的朋友。我舍不得那个一直在踢球的梅西，也希望那个终于能多休息一会儿的 Leo，身边依然热闹。
+
+### MSN：大杀四方的那些夜晚，足球真的美如画
+
+![2015 年对 Atlético Madrid 的比赛，Suárez、Neymar 与梅西搂肩奔跑庆祝](/images/posts/2026-messi-argentina-farewell/20-msn-iconic-celebration.jpg)
+
+*2015 年 1 月 11 日，Barcelona 3:1 Atlético Madrid。三个人都进了球，随后留下这张搂肩奔跑的经典照片。图片及比赛背景：[FC Barcelona 官方回顾](https://www.fcbarcelona.com/en/football/first-team/noticies/1103799/surez-neymar-and-messi-in-an-iconic-photograph)。*
+
+这张照片，我真的看多少次都不会厌。
+
+Suárez 在一边，梅西在另一边，Neymar 被他们夹在中间。三个人搂着肩，张开手臂，笑着往前跑。那时候的快乐，几乎不用文字解释。你一看就知道，他们刚刚又一起踢成了一件漂亮的事。
+
+MSN 留给我的，首先就是这种快乐。梅西把球带过来，Neymar 在另一侧加速，Suárez 已经钻进两个后卫之间。球从一个人脚下送到另一个人脚下，有时只碰一下，下一次跑动就接上了。看着看着，会忘记去数过了几个人，只等最后那一下：这次又会怎样把球送进去？
+
+2014/15 赛季，三个人合计打进 122 球；那个赛季，Barcelona 拿到了 La Liga、Copa del Rey 和 Champions League 的三冠王。[进球数字](https://as.com/futbol/2015/11/10/primera/1447124081_835215.html)和[俱乐部的赛季回顾](https://www.fcbarcelona.com/en/news/1074271/an-amazing-2015-for-fc-barcelona)都能查到。可“大杀四方”真正留在我记忆里的，是他们一次次把困难的进攻踢得那么自然，让人连庆祝之前都忍不住先赞叹一句：这球真漂亮。
+
+![2015 年 Champions League 对 Roma，梅西面对出击的 Szczęsny 完成挑射](/images/posts/2026-messi-argentina-farewell/21-msn-roma-goal.jpg)
+
+*2015 年 11 月 24 日，对 Roma 的连续配合，以梅西越过 Szczęsny 的挑射收尾。图片来源：[Antena 3 对这粒进球的回顾](https://www.antena3.com/champions-total/noticias/golazo-messi-roma-elegido-mejor-ano-votacion-uefa_2016082557c3eb510cf28cf698b19469.html)。*
+
+比如 6:1 Roma 那一晚，Neymar、Suárez、梅西连续配合，最后由梅西面对出击的 Szczęsny，轻轻把球挑过去。[当晚的比赛记录](https://www.fcbarcelona.com/en/news/1076510/fc-barcelona-hit-roma-for-six-6-1)还在。今天重新看，最喜欢的依然是进球之前的那几下：球走得快，人也一直在跑，最后那脚挑射却那么轻，像整段配合终于落到了它应该落下的位置。
+
+所谓美如画，大概就是这样。你明明知道结局，还是愿意把进度条往回拖，再看一次球是怎样从他们脚下穿过去的。
+
+今天送别蓝白 10 号，心里却同时亮起这些红蓝色的画面。因为陪我走过二十一年的，从来是完整的梅西：世界杯里一次次重新出发的他，Camp Nou 那个让人看得舍不得眨眼的他，还有进球以后，跑去抱住朋友的他。
+
+那张三人搂肩的照片里，他们还在往前跑。我知道时间已经过去很久了，可每次看见，仍然会有一小会儿，觉得那些比赛就在昨天。
+
+我愿意把这些旧照片和今天的祝福一起留下。有人亲自来到看台，有人隔着距离写下文字，还有更多人像我一样，在屏幕前看完，然后久久不想关掉。
 
 至于梅西身边这一批队友，今天最难接受的，恐怕还是下一次集结。球衣会准备好，训练会照常进行，熟悉的人又会回到更衣室，只是再也等不到他进门。
 
@@ -282,6 +342,10 @@ Lisandro Martínez 则把告别说得更加日常：原来总觉得这一天不�
 
 ### 2010，南非：原来最好的梅西，也会一球未进
 
+![2010 年世界杯负于德国后，Maradona 拥抱梅西](/images/posts/2026-messi-argentina-farewell/22-worldcup-2010.jpg)
+
+*2010 年 7 月 3 日，Cape Town。0:4 之后，Maradona 抱住梅西。摄影：Dylan Martinez / Reuters；图片来源：[AS 国家队历届大赛回顾](https://as.com/futbol/internacional/de-pechofrio-a-d10s-f202610-n/)。*
+
 2010 年的梅西已经是世界足坛最耀眼的球员之一，阿根廷主教练是 Maradona。两个让人无法绕开的名字站在一起，光是想象，就足够让人期待。
 
 可是那一届，他没有进球。阿根廷最终在四分之一决赛 0:4 输给德国。
@@ -291,6 +355,10 @@ Lisandro Martínez 则把告别说得更加日常：原来总觉得这一天不�
 他在俱乐部踢得那么好，世界杯却依然不肯轻易给他一个答案。我们开始知道，天才也有做不到的事情。但那时候还有一句很容易说出口的话：再等四年。
 
 ### 2014，巴西：四个进球以后，差了最后一步
+
+![2014 年世界杯决赛后，梅西望向近在眼前的大力神杯](/images/posts/2026-messi-argentina-farewell/23-worldcup-2014.jpg)
+
+*2014 年 7 月 13 日，Maracanã。近在眼前，却还要再等八年。摄影：鲍泰良 / 成都商报，《The Final Game》；图片来源：[Infobae](https://www.infobae.com/2015/02/12/1626316-una-imagen-lionel-messi-la-final-del-mundial-gano-el-premio-mas-prestigioso-la-fotografia/)，作品信息见 [World Press Photo](https://www.worldpressphoto.org/collection/photo-contest/2015/bao-tailiang/1)。*
 
 对波黑，连续配合后的突破与射门；对伊朗，迟迟打不开局面的比赛里，最后时刻那脚弧线球；对尼日利亚，先是一脚补射，随后又是一记任意球。四个进球，我到今天仍然可以把它们一个个想起来。[那届小组赛的进球记录](https://en.wikipedia.org/wiki/2014_FIFA_World_Cup_Group_F)，也是我记忆里最清楚的一段。
 
@@ -303,6 +371,10 @@ Lisandro Martínez 则把告别说得更加日常：原来总觉得这一天不�
 我们又说了一次：再等四年。只是这一次，心里已经开始算年龄了。
 
 ### 2018，俄罗斯：那一次停球，仍然完美
+
+![2018 年世界杯对尼日利亚，梅西用右脚完成射门](/images/posts/2026-messi-argentina-farewell/24-worldcup-2018.png)
+
+*2018 年 6 月 26 日，Saint Petersburg。接球、调整、右脚射门，一气呵成。图片来源：[FIFA 对这粒进球的官方回顾](https://inside.fifa.com/news/messi-finds-perfect-control-touch-finish)。*
 
 2018 年对尼日利亚，Banega 的长传越过防线。梅西用左大腿接住球，接着用左脚调整，最后右脚完成射门。三个动作连起来，几乎看不见多余的一下。[FIFA 专门回顾过这次停球与射门](https://inside.fifa.com/news/messi-finds-perfect-control-touch-finish)。
 
@@ -392,4 +464,4 @@ Lisandro Martínez 则把告别说得更加日常：原来总觉得这一天不�
 
 ---
 
-*本文是《别急着说再见》的续篇。现场事件依据 AFA、FIFA 与文中所链报道核对；比赛日期按北京时间记为 2026 年 10 月 7 日，现场为阿根廷时间 10 月 6 日。世界杯历史照片与当天照片已在图注中区分；照片及转播截图版权归原摄影师、机构和转播方所有。文中感受是写给梅西，也写给自己的告别。*
+*本文是《别急着说再见》的续篇。现场事件依据 AFA、FIFA 与文中所链报道核对；比赛日期按北京时间记为 2026 年 10 月 7 日，现场为阿根廷时间 10 月 6 日。世界杯、Barcelona 时期的历史照片与当天照片已在图注中区分；照片及转播截图版权归原摄影师、机构和转播方所有。文中感受是写给梅西，也写给自己的告别。*
