@@ -1,5 +1,5 @@
 ---
-title: "这次，真的告别：梅西的蓝白终章，与我回不去的 21 年"
+title: "最后一支探戈：梅西与阿根廷的最后 90 分钟"
 date: 2026-10-07T08:00:00+08:00
 draft: false
 tags: ["Argentina", "Lionel Messi", "World Cup", "Football", "Last Dance"]
