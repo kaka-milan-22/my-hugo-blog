@@ -465,3 +465,21 @@ Lisandro Martínez 则把告别说得更加日常：原来总觉得这一天不�
 ---
 
 *本文是《别急着说再见》的续篇。现场事件依据 AFA、FIFA 与文中所链报道核对；比赛日期按北京时间记为 2026 年 10 月 7 日，现场为阿根廷时间 10 月 6 日。世界杯、Barcelona 时期的历史照片与当天照片已在图注中区分；照片及转播截图版权归原摄影师、机构和转播方所有。文中感受是写给梅西，也写给自己的告别。*
+
+## 附：梅西亲笔告别信 · Carta de despedida
+
+最后，把文字交还给他。
+
+这封三页的亲笔信，由梅西于阿根廷当地时间 2026 年 8 月 31 日[在自己的 Instagram 公开](https://www.lanacion.com.ar/deportes/messi-se-despide-de-la-seleccion-esto-dice-la-carta-completa-nid31082026/)。他在信末注明，文字写于 7 月 21 日，世界杯决赛结束两天后。读到这个日期，我才发现：我在上一篇里还说着“下次见”的时候，他已经坐下来，写过一次告别了。
+
+**[查看梅西 Instagram 原帖中的亲笔信（西班牙语）](https://www.instagram.com/p/DctWzhYxElg/)** · **[阅读 AFA 官方刊载的完整西班牙语原文](https://www.afa.com.ar/es/posts/gracias-dios-por-hacerme-argentino-la-despedida-de-messi-en-sus-propias-palabras)**
+
+摘录自信中：
+
+> Amo, amé y amaré siempre estar en la Selección.
+
+> Gracias Dios por hacerme argentino.
+>
+> ¡Vamos Argentina!
+
+—— Lionel Messi
