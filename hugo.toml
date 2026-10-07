@@ -1,6 +1,6 @@
 baseURL = "https://blog.kakacn.com/"
 languageCode = "zh-cn"
-title = "我的技术博客"
+title = "Kaka's Blog"
 enableRobotsTXT = true
 
 defaultContentLanguage = "zh"
@@ -30,8 +30,8 @@ hasCJKLanguage = true
 
 # ---------------- 站点参数 ----------------
 [params]
-  description = "kaka 的技术博客，记录运维、云原生、网络与系统架构"
-  keywords = ["运维", "DevOps", "Linux", "云原生", "架构"]
+  description = "Kaka 的个人博客，记录 AI、Blockchain、DevOps、足球与生活"
+  keywords = ["Kaka", "AI", "Blockchain", "DevOps", "Linux", "云原生", "足球", "个人博客"]
   mainSections = ["posts"]
   toc = true
   enableEmoji = true
@@ -44,15 +44,15 @@ hasCJKLanguage = true
 [params.profile]
   enable = true
   name = "Kaka"
-  subtitle = "运维 / 云原生 / 架构 / 自动化"
+  subtitle = "AI / Blockchain / DevOps / 足球 / 生活"
   avatar = "/images/avatar.png"
 
 # ---------------- 作者信息（文章页使用） ----------------
 [params.author]
   name = "Kaka"
   avatar = "/images/avatar.png"
-  intro = "运维 / 云原生 / 架构 / 自动化"
-  description = "记录运维、云原生、网络与系统架构实践"
+  intro = "AI / Blockchain / DevOps / 足球 / 生活"
+  description = "记录技术实践、足球记忆与生活思考"
 
 # ---------------- 菜单 ----------------
 [[menu.main]]
@@ -115,4 +115,3 @@ hasCJKLanguage = true
     [languages.en.author]
       name = "Kaka"
       email = "kaka@kakacn.com"
-
